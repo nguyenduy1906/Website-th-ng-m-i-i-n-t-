@@ -1,0 +1,41 @@
+.venv/
+__pycache__/
+*.pyc
+data/*
+!data/erd.mmd
+!data/erd.html
+test-results/
+node_modules/
+.env
+
+# Local configuration and credentials
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Runtime databases, logs and exports
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.log
+*.zip
+*.7z
+*.bak
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Nested upstream Git metadata (keep source and licenses)
+/tools/**/.git/
+/tools/**/.git
+
+/github-export/

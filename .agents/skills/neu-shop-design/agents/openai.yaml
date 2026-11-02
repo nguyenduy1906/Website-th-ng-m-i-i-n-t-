@@ -1,0 +1,4 @@
+interface:
+  display_name: "NEU SHOP Design"
+  short_description: "Thống nhất giao diện cửa hàng công nghệ NEU SHOP"
+  default_prompt: "Dùng $neu-shop-design để xây dựng hoặc chỉnh sửa giao diện NEU SHOP theo DESIGN.md của dự án."

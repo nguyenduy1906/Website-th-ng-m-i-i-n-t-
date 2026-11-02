@@ -1,0 +1,8 @@
+{
+  "project": "NEU SHOP local demo",
+  "sources": ["AGENTS.md:1", "DESIGN.md:1", "DESIGN.md:36"],
+  "preserved": ["NEU SHOP locked palette and typography", "1200px content width", "commerce catalogue structure", "npm scripts", "upstream Hallmark files"],
+  "introduced": ["Python FastAPI and Jinja2 application", "SQLite local persistence", "authored demo product SVGs", "responsive shopping and administration pages"],
+  "theme": "NEU SHOP locked design system; theme deal skipped",
+  "material": "Explicitly labeled sample inventory and original SVG illustrations; no fabricated business contacts, reviews, customer counts or fulfillment promises"
+}

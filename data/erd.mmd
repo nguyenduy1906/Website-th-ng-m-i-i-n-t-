@@ -1,0 +1,147 @@
+erDiagram
+  CUSTOMER ||--o| CART : owns
+  CUSTOMER ||--o{ ORDERS : places
+  CUSTOMER ||--o{ REVIEW : writes
+  CUSTOMER ||--o{ NOTIFICATION : receives
+  CART ||--o{ CART_ITEM : contains
+  CATEGORY ||--o{ PRODUCT : groups
+  BRAND ||--o{ PRODUCT : makes
+  PRODUCT ||--|{ PRODUCT_VARIANT : has
+  PRODUCT ||--o{ REVIEW : receives
+  PRODUCT_VARIANT ||--o{ CART_ITEM : added_as
+  PRODUCT_VARIANT ||--o{ ORDER_ITEM : sold_as
+  ORDERS ||--|{ ORDER_ITEM : contains
+  ORDERS ||--o| INSTALLMENT_CONTRACT : financed_by
+  ORDERS ||--o{ PAYMENT : paid_by
+  FINANCE_PARTNER ||--o{ INSTALLMENT_PLAN : offers
+  INSTALLMENT_PLAN ||--o{ INSTALLMENT_CONTRACT : applied_in
+  INSTALLMENT_CONTRACT ||--|{ INSTALLMENT_SCHEDULE : split_into
+  INSTALLMENT_SCHEDULE ||--o{ PAYMENT : settled_by
+  INSTALLMENT_SCHEDULE ||--o{ NOTIFICATION : triggers
+
+  CUSTOMER {
+    int customer_id PK
+    string full_name
+    string email UK
+    string phone
+    string password_hash
+    string address
+    date birth_date
+    string gender
+    datetime created_at
+  }
+  CATEGORY {
+    int category_id PK
+    string name
+  }
+  BRAND {
+    int brand_id PK
+    string name
+  }
+  PRODUCT {
+    int product_id PK
+    int category_id FK
+    int brand_id FK
+    string name
+    text description
+    date release_date
+    boolean installment_eligible
+  }
+  PRODUCT_VARIANT {
+    int variant_id PK
+    int product_id FK
+    string color
+    string storage
+    decimal price
+    int stock_qty
+  }
+  CART {
+    int cart_id PK
+    int customer_id FK
+    datetime updated_at
+  }
+  CART_ITEM {
+    int cart_item_id PK
+    int cart_id FK
+    int variant_id FK
+    int quantity
+  }
+  ORDERS {
+    int order_id PK
+    int customer_id FK
+    datetime order_date
+    string receive_method
+    string shipping_address
+    string payment_type
+    decimal total_amount
+    string status
+  }
+  ORDER_ITEM {
+    int order_id PK
+    int variant_id PK
+    int quantity
+    decimal unit_price
+  }
+  REVIEW {
+    int review_id PK
+    int customer_id FK
+    int product_id FK
+    int rating
+    text content
+    string image_url
+    datetime created_at
+  }
+  FINANCE_PARTNER {
+    int partner_id PK
+    string name
+    string partner_type
+  }
+  INSTALLMENT_PLAN {
+    int plan_id PK
+    int partner_id FK
+    int term_months
+    decimal interest_rate
+    decimal min_down_payment_pct
+  }
+  INSTALLMENT_CONTRACT {
+    int contract_id PK
+    int order_id FK
+    int plan_id FK
+    string installment_type
+    string card_type
+    decimal down_payment
+    decimal monthly_amount
+    date start_date
+    date end_date
+    string approval_status
+    datetime signed_at
+  }
+  INSTALLMENT_SCHEDULE {
+    int schedule_id PK
+    int contract_id FK
+    int period_no
+    date due_date
+    decimal amount_due
+    decimal penalty_amount
+    date paid_date
+    string status
+  }
+  PAYMENT {
+    int payment_id PK
+    int order_id FK
+    int schedule_id FK
+    string method
+    decimal amount
+    string transaction_ref
+    string status
+    datetime paid_at
+  }
+  NOTIFICATION {
+    int notification_id PK
+    int customer_id FK
+    int schedule_id FK
+    string type
+    string channel
+    datetime sent_at
+    string status
+  }

@@ -1,0 +1,73 @@
+Đóng vai là một Senior Frontend Developer, UI/UX Expert và Software Architect. Tôi đang xây dựng một hệ thống Website Thương mại điện tử toàn diện dựa trên tài liệu Phân tích nghiệp vụ (BA) chi tiết. Nhiệm vụ của bạn là lập trình phần Giao diện (Frontend) hoàn chỉnh cho cả 2 phân hệ: Giao diện Người dùng (Customer Storefront) và Giao diện Quản trị viên (Admin Dashboard).
+
+=== YÊU CẦU KỸ THUẬT & CÔNG NGHỆ ===
+- Tech Stack: [Điền công nghệ vào đây, VD: React.js, Next.js, Tailwind CSS, TypeScript].
+- Yêu cầu phi chức năng (NFR): Giao diện phải hoàn toàn Responsive (Mobile, Tablet, Desktop). Thiết kế hiện đại, Clean UI. Có xử lý đầy đủ các trạng thái UI: Loading spinner, Hover effects, Active states, Error states, Form validation (hiển thị viền đỏ và text lỗi), Toasts/Notifications (Thành công/Thất bại).
+- Dữ liệu: Sử dụng Mock Data (dữ liệu giả) có cấu trúc JSON thực tế, phức tạp và liên kết với nhau để hiển thị lên UI, không dùng dữ liệu rỗng.
+- Kiến trúc code: Viết code theo hướng Component-based, tái sử dụng cao. Chia rõ thư mục (components, pages, layouts, utils, hooks).
+
+Dưới đây là đặc tả chi tiết các màn hình cần xây dựng:
+
+=== PHẦN 1: GIAO DIỆN NGƯỜI DÙNG (CUSTOMER STOREFRONT) ===
+
+1. Layout Chính (Main Layout):
+- Header: Logo, Thanh tìm kiếm thông minh (có auto-suggest UI), Icon Giỏ hàng (hiển thị badge số lượng realtime), Nút Đăng nhập/Đăng ký, Avatar/Dropdown menu khi đã đăng nhập. Thanh menu danh mục sản phẩm đa cấp (Mega Menu). Hỗ trợ nút chuyển đổi ngôn ngữ (VI/EN).
+- Footer: Chứa các cột: Về chúng tôi, Hỗ trợ khách hàng, Chính sách đổi trả/thanh toán, Link mạng xã hội, Nhận bản tin.
+
+2. Trang Chủ (Home Page):
+- Hero Section: Banner Slider (Carousel) quảng cáo các chiến dịch khuyến mãi lớn.
+- Sections: "Sản phẩm nổi bật" (Featured), "Flash Sale" (có đồng hồ đếm ngược), "Sản phẩm mới nhất", "Thương hiệu nổi bật".
+- UI Card Sản phẩm: Hình ảnh, Tên SP, Giá gốc, Giá khuyến mãi (nếu có), % giảm giá, Đánh giá sao, Nút Add to Cart nhanh.
+
+3. Trang Danh sách/Tìm kiếm Sản phẩm (Product List/Category):
+- Sidebar Trái: Bộ lọc đa năng (Danh mục, Thương hiệu, Khoảng giá dạng slider, Số sao đánh giá, Thuộc tính như kích cỡ/màu sắc).
+- Khu vực chính: Grid hiển thị sản phẩm, Breadcrumbs. Dropdown Sắp xếp (Nổi bật, Mới nhất, Giá tăng/giảm). Phân trang (Pagination).
+
+4. Trang Chi tiết Sản phẩm (Product Detail):
+- Khu vực hình ảnh: Gallery ảnh (có ảnh chính lớn và danh sách thumbnail nhỏ bên dưới, hỗ trợ zoom).
+- Khu vực thông tin: Tên sản phẩm, SKU, Giá, Label khuyến mãi.
+- Lựa chọn biến thể (Variants): Chọn Màu sắc (hiển thị swatch màu), Kích cỡ/Dung lượng. Trạng thái nút thay đổi nếu hết hàng. Hiển thị số lượng tồn kho.
+- Hành động: Chọn số lượng (+/-), Nút "Thêm vào giỏ hàng" và "Mua ngay".
+- Tabs nội dung: Mô tả chi tiết sản phẩm, Thông số kỹ thuật, Đánh giá sản phẩm (Star rating tổng quan, upload ảnh feedback, bình luận của khách, nút phản hồi của Admin).
+
+5. Trang Giỏ hàng (Cart) & Thanh toán (Checkout):
+- Giỏ hàng (Cart): Hiển thị dạng bảng (Hình ảnh, tên SP, biến thể, Đơn giá, Input số lượng, Thành tiền, Nút xóa). Có ô nhập mã Voucher ưu đãi. Bảng tạm tính tổng tiền.
+- Thanh toán (Checkout): Form nhập thông tin nhận hàng (Tên, SĐT, Tỉnh/Thành, Quận/Huyện, Địa chỉ chi tiết). Lựa chọn hình thức nhận hàng (Giao tận nơi/Nhận tại cửa hàng). 
+- Phương thức thanh toán (Radio options): Thanh toán khi nhận hàng (COD), Thẻ ATM/Quốc tế, Quét mã QR, Ví điện tử. 
+- Bảng tóm tắt đơn hàng, phí vận chuyển, tiền giảm voucher và Tổng thanh toán cuối cùng. Nút "Đặt hàng".
+
+6. Trang Quản lý Tài khoản (Customer Portal):
+- Sidebar: Hồ sơ cá nhân, Sổ địa chỉ, Lịch sử đơn hàng, Thông báo.
+- Lịch sử đơn hàng: Danh sách các đơn (Mã ĐH, Ngày đặt, Trạng thái: "Chờ xác nhận, Đang chuẩn bị, Đang giao, Hoàn tất, Đã hủy, Trả hàng", Tổng tiền).
+- Chi tiết đơn hàng: Timeline theo dõi vận chuyển. Nút "Yêu cầu đổi/trả hàng" (Mở modal cho phép chọn lý do, tải ảnh lên).
+
+=== PHẦN 2: GIAO DIỆN QUẢN TRỊ VIÊN (ADMIN DASHBOARD) ===
+
+1. Layout Admin:
+- Layout thiết kế chuẩn Dashboard quản trị.
+- Sidebar (Cố định trái, có thể thu gọn): Tổng quan (Dashboard), Quản lý Sản phẩm, Quản lý Đơn hàng, Quản lý Khuyến mãi, Quản lý Đổi/Trả hàng.
+- Topbar: Thanh tìm kiếm, Chuông thông báo, Avatar Admin, Dropdown cài đặt/Đăng xuất.
+
+2. Trang Tổng quan (Dashboard):
+- Thống kê nhanh (Cards): Tổng doanh thu, Đơn hàng mới, Chờ xử lý, Cảnh báo tồn kho thấp.
+- Biểu đồ (Charts): Dùng thư viện (như Recharts). Biểu đồ cột/đường thể hiện Doanh thu theo thời gian, Biểu đồ tròn cho Trạng thái đơn hàng.
+
+3. Trang Quản lý Sản phẩm:
+- Bảng danh sách: Cột (Hình ảnh, Tên SP, Danh mục, Giá, Tồn kho, Trạng thái Kích hoạt/Ẩn). Có công cụ Tìm kiếm, Lọc theo danh mục.
+- Form Thêm/Sửa sản phẩm: Tên, Mô tả, Hình ảnh (Khu vực kéo thả upload), Danh mục, Thương hiệu. 
+- Quản lý Biến thể (Đặc biệt quan trọng): UI cho phép thêm các thuộc tính (Màu, Size) và sinh ra bảng để nhập Giá bán, Số lượng tồn kho, SKU cho từng biến thể cụ thể.
+
+4. Trang Quản lý Đơn hàng & Vận hành:
+- Bảng danh sách đơn hàng: (Mã ĐH, Tên khách, Ngày đặt, Hình thức thanh toán, Tổng tiền, Trạng thái).
+- UI xử lý đơn: Dropdown chuyển đổi trạng thái (Chờ xác nhận -> Đang chuẩn bị -> Đã bàn giao vận chuyển -> Hoàn tất).
+- Tab xử lý Yêu cầu Đổi/Trả hàng: Hiển thị lý do, ảnh đính kèm từ khách, nút "Chấp nhận hoàn tiền" hoặc "Từ chối".
+
+5. Trang Quản lý Khuyến mãi (Voucher):
+- Bảng danh sách Voucher: Mã Code, Loại giảm (%), Giá trị giảm, Đơn tối thiểu, Thời gian áp dụng, Lượt dùng. Nút Toggle Bật/Tắt voucher.
+
+=== HƯỚNG DẪN THỰC THI CHO AI ===
+Vì đây là một dự án lớn, hãy làm việc theo từng bước. 
+BƯỚC 1: Hãy tóm tắt lại kiến trúc bạn sẽ thiết lập và xác nhận bạn đã hiểu toàn bộ luồng nghiệp vụ.
+BƯỚC 2: Cung cấp trước toàn bộ Mock Data (JSON) chung cho cả dự án để đảm bảo tính nhất quán.
+BƯỚC 3: Bắt đầu sinh code từ Main Layout và Home Page của Customer Storefront. 
+Hãy đợi tôi xác nhận "Tiếp tục" sau mỗi file hoặc cụm tính năng để code không bị cắt ngang. Chú trọng vào UI/UX chuyên nghiệp, đẹp mắt nhất có thể.

@@ -1,0 +1,27 @@
+{
+  "name": "neu-shop-local",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "catalog:collect": "node tools/collect-catalog.mjs",
+    "catalog:images": "python tools/prepare_catalog.py",
+    "catalog:import": "python -m app.db --import-catalog docs/catalog-real.json",
+    "catalog:check": "node tools/check-catalog.mjs",
+    "check:layout:customer": "node tests/customer-layout.mjs",
+    "check:layout:admin": "node tests/admin-layout.mjs",
+    "check:live-filters": "node tests/live-filters.mjs",
+    "check:redesign": "node tests/redesign.mjs --after",
+    "check:portal": "node tests/portal-browser.mjs",
+    "demo:seed": "python -m app.db --seed-demo",
+    "docs:erd": "node tools/build-erd.mjs",
+    "dev": "python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000",
+    "start": "python -m uvicorn app.main:app --host 127.0.0.1 --port 8000",
+    "check": "python -m unittest discover -s tests -v",
+    "check:browser": "node tests/browser.mjs",
+    "design:check": "node .agents/skills/hallmark/scripts/sloplint.mjs app/static/style.css app/static/customer.css app/static/admin.css app/static/ui.css --scope app --render --url http://127.0.0.1:8000/ --url http://127.0.0.1:8000/admin/login",
+    "github:prepare": "python tools/prepare_github.py"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^25.16.0"
+  }
+}

@@ -1,0 +1,766 @@
+PHÂN TÍCH NGHIỆP VỤ WEBSITE THƯƠNG MẠI ĐIỆN TỬ
+Phiên bản viết lại từ báo cáo “Phân tích nghiệp vụ quy trình mua hàng trả góp online trên FPT Shop” (UEH Vĩnh Long, 04/2024). Phạm vi được mở rộng từ một quy trình trả góp sang toàn bộ nghiệp vụ của một website bán hàng trực tuyến; trả góp chỉ còn là một phương thức thanh toán tùy chọn.
+PHẦN 1: GIỚI THIỆU
+1.1. Bối cảnh và lý do chọn đề tài
+Thương mại điện tử (TMĐT) đã trở thành kênh bán lẻ chủ lực: khách hàng so sánh giá, đọc đánh giá và mua sắm mọi lúc mọi nơi. Một website TMĐT hiệu quả cần giải quyết trọn vẹn chuỗi giá trị: trưng bày sản phẩm → đặt hàng → thanh toán → giao hàng → hậu mãi, đồng thời bảo đảm minh bạch về giá, an toàn thanh toán và bảo mật dữ liệu.
+Các hạn chế thường gặp ở hệ thống bán hàng hiện tại (tương ứng với các khó khăn đã nêu trong báo cáo gốc):
+Quy trình xử lý đơn và đối soát thanh toán còn thủ công, chậm và dễ sai sót.
+Giá, tồn kho, mô tả sản phẩm không đồng nhất giữa các kênh.
+Thông tin đơn hàng, vận chuyển không được cập nhật kịp thời cho khách.
+Hệ thống thanh toán thỉnh thoảng bị lỗi; hỗ trợ khách hàng phản hồi chậm.
+Đánh giá sản phẩm thiếu minh bạch; chưa hỗ trợ đa dạng phương thức thanh toán và đa ngôn ngữ.
+Mục tiêu của đề tài: phân tích và đặc tả nghiệp vụ cho một website TMĐT hoàn chỉnh, làm nền tảng thiết kế cơ sở dữ liệu và phát triển hệ thống.
+1.2. Mô tả hệ thống hiện tại (As-Is)
+1.2.1. Quy trình đặt mua hàng hiện tại
+Khách hàng truy cập website/ứng dụng, tìm kiếm và chọn sản phẩm.
+Chọn phân loại (màu sắc, dung lượng, kích cỡ…), thêm vào giỏ hàng hoặc “Mua ngay”.
+Điền thông tin người nhận, chọn hình thức nhận hàng (giao tận nơi / nhận tại cửa hàng).
+Chọn phương thức thanh toán (COD, chuyển khoản, thẻ, ví điện tử).
+Nhân viên gọi điện xác nhận đơn (thủ công), kiểm tra tồn kho.
+Nhân viên đóng gói, bàn giao đơn vị vận chuyển; khách chờ nhận hàng.
+1.2.2. Quy trình thanh toán và hậu mãi hiện tại
+Khách thanh toán trước hoặc thanh toán khi nhận hàng (COD).
+Kế toán đối soát thủ công giữa cổng thanh toán, đơn vị vận chuyển và đơn hàng.
+Khi có yêu cầu đổi/trả, khách liên hệ tổng đài; nhân viên xử lý và hoàn tiền thủ công.
+Khách có thể đánh giá sản phẩm nhưng chưa có cơ chế xác thực người mua thật.
+1.3. Các bên liên quan (Stakeholders)
+Nhóm
+Bên liên quan
+Vai trò chính
+Influence
+Interest
+Owner
+Chủ sở hữu / Ban quản lý website
+Quyết định chiến lược, chính sách giá, khuyến mãi, đối tác
+High
+High
+Customer
+Khách hàng
+Tìm kiếm, đặt mua, thanh toán, đánh giá
+Low
+High
+Employee
+Nhân viên chăm sóc khách hàng
+Xác nhận đơn, hỗ trợ, xử lý khiếu nại
+Some
+High
+Employee
+Nhân viên quản lý kho / đóng gói
+Kiểm kê tồn kho, chuẩn bị hàng
+Some
+Some
+Employee
+Nhân viên quản lý sản phẩm / nội dung
+Đăng sản phẩm, cập nhật giá, mô tả, khuyến mãi
+Some
+High
+Employee
+Kế toán
+Đối soát thanh toán, hoàn tiền, báo cáo doanh thu
+Some
+Some
+Partner
+Cổng thanh toán / ngân hàng / ví điện tử
+Xử lý giao dịch trực tuyến
+High
+Some
+Partner
+Đơn vị vận chuyển
+Giao hàng, thu hộ COD, hoàn hàng
+Some
+Some
+Partner
+Nhà cung cấp / nhà bán (seller)
+Cung ứng hàng hóa, cập nhật tồn kho
+Some
+Some
+Partner (tùy chọn)
+Công ty tài chính / ngân hàng trả góp
+Thẩm định và giải ngân trả góp
+Some
+Low
+
+Stakeholder Power/Interest Grid (tóm tắt):
+Quản lý chặt (High/High): Ban quản lý website.
+Giữ hài lòng (High/Some–Low): Cổng thanh toán.
+Thông tin thường xuyên (Some–Low/High): Khách hàng, nhân viên CSKH, nhân viên sản phẩm.
+Theo dõi (Some/Some): Vận chuyển, kho, kế toán, nhà cung cấp.
+1.4. Ma trận RACI
+Bảng 1.1. RACI quy trình đặt hàng
+Hoạt động
+Khách hàng
+Hệ thống
+NV CSKH
+NV Kho
+Đơn vị vận chuyển
+Tìm kiếm, chọn sản phẩm
+R
+I
+
+
+
+
+
+
+Quản lý giỏ hàng
+R
+I
+
+
+
+
+
+
+Nhập thông tin nhận hàng
+R
+I
+
+
+
+
+
+
+Tạo đơn hàng
+R
+A
+I
+
+
+
+
+Kiểm tra tồn kho
+I
+R
+
+
+A
+
+
+Xác nhận đơn (khi cần)
+I
+
+
+R/A
+
+
+
+
+Đóng gói, bàn giao vận chuyển
+I
+I
+I
+R/A
+C
+Giao hàng
+I
+I
+I
+
+
+R/A
+Xác nhận đã nhận hàng
+R
+I
+
+
+
+
+I
+
+Bảng 1.2. RACI quy trình thanh toán và hậu mãi
+Hoạt động
+Khách hàng
+Hệ thống
+Cổng thanh toán
+Kế toán
+NV CSKH
+Đơn vị vận chuyển
+Chọn phương thức thanh toán
+R
+I
+
+
+
+
+
+
+
+
+Xử lý giao dịch trực tuyến
+I
+A
+R
+I
+
+
+
+
+Thu tiền COD
+I
+I
+
+
+I
+
+
+R
+Đối soát thanh toán
+
+
+I
+C
+R/A
+
+
+C
+Yêu cầu đổi / trả / hoàn tiền
+R
+I
+
+
+
+
+A
+
+
+Hoàn tiền
+I
+I
+R
+R/A
+C
+
+
+Đánh giá sản phẩm
+R
+I
+
+
+
+
+I
+
+
+
+1.5. Những khó khăn của hệ thống hiện tại và yêu cầu cải tiến
+Bảng 1.3. Khó khăn và hướng cải tiến
+STT
+Nhóm
+Nguyên nhân
+Yêu cầu cải tiến
+1
+Khách hàng
+Ngôn ngữ chưa đa dạng; chính sách thanh toán, đổi trả chưa rõ ràng; bảo mật chưa đảm bảo
+Hỗ trợ đa ngôn ngữ; công bố rõ chính sách; siết chặt bảo mật dữ liệu người dùng
+2
+Khách hàng
+Giá không đồng nhất; mô tả sản phẩm thiếu chính xác
+Quản lý giá tập trung; chuẩn hóa thông tin sản phẩm
+3
+Khách hàng
+Thanh toán lỗi; hỗ trợ xử lý chậm; lỗi hiển thị
+Nâng cấp cổng thanh toán, cơ chế retry; hỗ trợ đa kênh; kiểm thử hiển thị
+4
+Kỹ thuật
+Tốc độ tải trang chậm, hạ tầng chưa đủ tải
+Tối ưu hiệu năng, CDN, cache, mở rộng hạ tầng
+5
+Vận hành
+Đánh giá thiếu minh bạch; không thông báo trạng thái đơn; ít phương thức thanh toán
+Chỉ cho đánh giá khi đã mua; thông báo tự động theo trạng thái đơn; tích hợp QR, ví điện tử, thẻ, COD
+
+1.6. Định hướng giải pháp
+Mục tiêu
+Xây dựng website TMĐT minh bạch, an toàn, dễ sử dụng.
+Tự động hóa quy trình đặt hàng, thanh toán, đối soát và theo dõi vận chuyển.
+Nâng cao trải nghiệm khách hàng và hiệu quả vận hành.
+Phạm vi
+Trong phạm vi: quản lý tài khoản, danh mục và sản phẩm, tìm kiếm – lọc, giỏ hàng, đặt hàng, thanh toán trực tuyến, khuyến mãi (voucher), vận chuyển và theo dõi đơn, đổi trả – hoàn tiền, đánh giá, thông báo, báo cáo cho quản trị.
+Ngoài phạm vi (giai đoạn đầu): sàn đa người bán đầy đủ, ứng dụng di động native, chương trình trả góp qua công ty tài chính (có thể mở rộng sau).
+Giải pháp chính
+Mua sắm: tìm kiếm thông minh, bộ lọc, so sánh sản phẩm, giỏ hàng lưu theo tài khoản.
+Đơn hàng: tự động kiểm tra tồn kho, xác nhận đơn tự động, theo dõi trạng thái theo thời gian thực.
+Thanh toán: COD, thẻ ATM/quốc tế, QR, ví điện tử; tự động đối soát; hóa đơn điện tử.
+Khuyến mãi: voucher, flash sale, tích điểm.
+Hậu mãi: đổi trả, hoàn tiền, bảo hành, chat/hotline/email.
+Bảo mật: xác thực 2 lớp (OTP), mã hóa dữ liệu, tuân thủ quy định bảo vệ dữ liệu cá nhân.
+PHẦN 2: YÊU CẦU VÀ QUY TRÌNH HỆ THỐNG MỚI (TO-BE)
+2.1. Yêu cầu hệ thống
+2.1.1. Yêu cầu nghiệp vụ chung (Business Requirement)
+ID
+Tên
+Mô tả
+Nguồn
+Ưu tiên
+BR01
+Chi phí xây dựng
+Dự toán chi phí xây dựng và vận hành hệ thống
+Ban quản lý
+Should have
+BR02
+Minh bạch thông tin
+Hiển thị rõ giá, phí vận chuyển, thuế, khuyến mãi, chính sách đổi trả trước khi thanh toán
+Khách hàng
+Must have
+BR03
+Giảm rủi ro thất thoát
+Tự động đối soát thanh toán/COD, cảnh báo đơn bất thường, hạn chế đơn ảo
+Ban quản lý, Kế toán
+Should have
+BR04
+Chính sách và an toàn thanh toán
+Áp dụng biện pháp an ninh cho mọi giao dịch
+Ban quản lý, Khách hàng
+Must have
+BR05
+Bảo mật thông tin
+Bảo vệ dữ liệu cá nhân theo quy định hiện hành
+Khách hàng
+Must have
+BR06
+Hỗ trợ đa ngôn ngữ
+Tối thiểu Tiếng Việt và Tiếng Anh
+Khách hàng
+Could have
+BR07
+Phù hợp văn hóa, pháp lý
+Nội dung phù hợp thuần phong mỹ tục; tuân thủ quy định TMĐT
+Ban quản lý
+Must have
+BR08
+Báo cáo kinh doanh
+Doanh thu, đơn hàng, tồn kho, hành vi khách hàng
+Ban quản lý
+Should have
+
+2.1.2. Yêu cầu kỹ thuật (Technical Requirement)
+ID
+Tên
+Mô tả
+Nguồn
+Ưu tiên
+TR01
+Môi trường vận hành
+Chạy ổn định trên thiết bị phổ thông (RAM 4GB, CPU tương đương Core i3 trở lên)
+Ban quản lý
+Should have
+TR02
+Đồng bộ dữ liệu
+Giá, tồn kho, trạng thái đơn được cập nhật đồng bộ và kịp thời
+Ban quản lý
+Should have
+TR03
+Xử lý dữ liệu chính xác
+Giao dịch có tính toàn vẹn (transaction), không sai lệch số liệu
+Ban quản lý
+Must have
+TR04
+Hạ tầng và kết nối
+Hạ tầng có khả năng mở rộng, băng thông đủ đáp ứng cao điểm khuyến mãi
+Ban quản lý
+Should have
+TR05
+Tích hợp hệ thống
+Tích hợp cổng thanh toán, đơn vị vận chuyển, ERP/kế toán, email/SMS
+Ban quản lý
+Must have
+
+2.1.3. Yêu cầu chức năng (Functional Requirement)
+ID
+Chức năng
+Mô tả
+Tác nhân
+Ưu tiên
+FR01
+Đăng ký
+Tạo tài khoản bằng email/số điện thoại, xác thực OTP
+Khách hàng
+Must have
+FR02
+Đăng nhập
+Đăng nhập, quên/đổi mật khẩu, xác thực 2 lớp
+Khách hàng, Nhân viên
+Must have
+FR03
+Đăng xuất
+Kết thúc phiên đăng nhập
+Khách hàng, Nhân viên
+Must have
+FR04
+Tìm kiếm theo từ khóa
+Tìm sản phẩm theo từ khóa, gợi ý tìm kiếm
+Khách hàng
+Must have
+FR05
+Lọc sản phẩm
+Lọc theo danh mục, thương hiệu, giá, đánh giá, thuộc tính
+Khách hàng
+Should have
+FR06
+Sắp xếp sản phẩm
+Nổi bật, mới nhất, % giảm, giá tăng/giảm
+Khách hàng
+Could have
+FR07
+Xem chi tiết sản phẩm
+Hình ảnh, mô tả, giá, biến thể, tồn kho, khuyến mãi, bảo hành, đánh giá
+Khách hàng
+Must have
+FR08
+So sánh sản phẩm
+So sánh thông số và giá
+Khách hàng
+Should have
+FR09
+Quản lý giỏ hàng
+Thêm, xóa, đổi số lượng, chọn sản phẩm để thanh toán
+Khách hàng
+Must have
+FR10
+Áp dụng khuyến mãi
+Nhập/chọn voucher, tự động tính giảm giá
+Khách hàng
+Should have
+FR11
+Đặt hàng
+Nhập địa chỉ, chọn hình thức nhận hàng, vận chuyển, thanh toán, xác nhận đơn
+Khách hàng
+Must have
+FR12
+Thanh toán trực tuyến
+Thẻ ATM/quốc tế, QR, ví điện tử, COD
+Khách hàng, Cổng thanh toán
+Must have
+FR13
+Quản lý tài khoản
+Hồ sơ cá nhân, sổ địa chỉ, đổi mật khẩu, điểm tích lũy
+Khách hàng
+Must have
+FR14
+Theo dõi đơn hàng
+Xem trạng thái: chờ xác nhận, đang chuẩn bị, đang giao, hoàn tất, đã hủy, trả hàng
+Khách hàng
+Must have
+FR15
+Hủy đơn / đổi trả / hoàn tiền
+Tạo yêu cầu, theo dõi xử lý, hoàn tiền về phương thức gốc
+Khách hàng, NV CSKH
+Must have
+FR16
+Đánh giá sản phẩm
+Chấm sao, viết nhận xét, tải ảnh (chỉ khi đã mua)
+Khách hàng
+Should have
+FR17
+Bình luận hỏi đáp
+Hỏi đáp tại trang sản phẩm, nhân viên trả lời
+Khách hàng, Nhân viên
+Could have
+FR18
+Chat trực tuyến
+Chat với nhân viên hỗ trợ
+Khách hàng, Nhân viên
+Should have
+FR19
+Thông báo
+Thông báo trạng thái đơn, thanh toán, khuyến mãi qua email/SMS/app
+Hệ thống
+Must have
+FR20
+Tin tức, sự kiện
+Bài viết, cẩm nang, chương trình khuyến mãi
+Khách hàng
+Could have
+FR21
+Quản lý sản phẩm
+Thêm/sửa/ẩn sản phẩm, biến thể, giá, hình ảnh, danh mục, thương hiệu
+NV sản phẩm
+Must have
+FR22
+Quản lý tồn kho
+Nhập/xuất kho, cảnh báo tồn thấp
+NV Kho
+Must have
+FR23
+Quản lý đơn hàng
+Duyệt, đóng gói, bàn giao vận chuyển, cập nhật trạng thái
+NV CSKH, NV Kho
+Must have
+FR24
+Quản lý khuyến mãi
+Tạo voucher, chương trình giảm giá, điều kiện áp dụng
+Quản trị
+Should have
+FR25
+Đối soát và báo cáo
+Đối soát thanh toán/COD; báo cáo doanh thu, tồn kho, sản phẩm bán chạy
+Kế toán, Quản trị
+Should have
+FR26
+Quản trị người dùng và phân quyền
+Quản lý tài khoản nhân viên, vai trò, nhật ký thao tác
+Quản trị
+Must have
+
+2.1.4. Yêu cầu phi chức năng (Non-functional Requirement)
+ID
+Tên
+Mô tả
+Ưu tiên
+NFR01
+Tốc độ tải trang
+Mọi trang tải không quá 3 giây trong điều kiện mạng ổn định
+Should have
+NFR02
+Xử lý đặt hàng
+Từ lúc xác nhận đặt hàng đến lúc có kết quả không quá 2 phút
+Should have
+NFR03
+Cập nhật trạng thái
+Thay đổi trạng thái đơn/thanh toán được cập nhật không quá 3 phút
+Should have
+NFR04
+Bảo mật
+Mã hóa dữ liệu nhạy cảm; không lưu số thẻ thô (dùng token của cổng thanh toán); HTTPS toàn bộ
+Must have
+NFR05
+Điều hướng
+Thanh điều hướng, menu danh mục dễ dùng
+Should have
+NFR06
+Thống nhất nội dung
+Giao diện và nội dung nhất quán
+Could have
+NFR07
+Tương thích trình duyệt
+Chrome, Firefox, Safari, Edge
+Must have
+NFR08
+Responsive
+Hiển thị tốt trên máy tính, tablet, điện thoại
+Must have
+NFR09
+SEO
+URL thân thiện, tiêu đề và mô tả chuẩn, tối ưu tốc độ
+Should have
+NFR10
+Khả năng mở rộng và sẵn sàng
+Chịu tải cao điểm; mức sẵn sàng mục tiêu ≥ 99,5%
+Should have
+
+2.2. Mô tả quy trình nghiệp vụ hệ thống mới (To-Be)
+2.2.1. Quy trình đặt mua online
+Khách hàng truy cập website, tìm kiếm theo từ khóa hoặc bộ lọc, xem chi tiết và chọn phân loại sản phẩm.
+Khách thêm sản phẩm vào giỏ hoặc chọn “Mua ngay”. Nếu chưa đăng nhập, hệ thống yêu cầu đăng nhập; chưa có tài khoản thì đăng ký.
+Tại trang thanh toán, khách chọn/nhập địa chỉ nhận hàng, hình thức nhận (giao tận nơi hoặc nhận tại cửa hàng), đơn vị vận chuyển và áp dụng voucher (nếu có). Hệ thống tính tổng tiền gồm giá hàng, phí vận chuyển, giảm giá.
+Khách chọn phương thức thanh toán rồi nhấn “Đặt hàng”.
+Hệ thống kiểm tra tồn kho:
+Còn hàng: tạo đơn hàng, giữ tồn kho và gửi thông báo xác nhận đặt hàng.
+Hết hàng: thông báo cho khách và đề xuất sản phẩm thay thế hoặc cho phép sửa giỏ hàng.
+Với đơn thanh toán trực tuyến, khách chuyển sang cổng thanh toán, xác thực (OTP/3D Secure); hệ thống nhận kết quả giao dịch.
+Thành công: đơn chuyển trạng thái “Đã thanh toán”.
+Thất bại / hết hạn: khách được thanh toán lại hoặc chuyển sang COD; quá thời hạn đơn tự hủy và trả tồn kho.
+Đơn hợp lệ được chuyển cho kho. Đơn giá trị cao hoặc có dấu hiệu bất thường được nhân viên CSKH xác nhận qua điện thoại.
+Kho đóng gói, bàn giao đơn vị vận chuyển; hệ thống gửi mã vận đơn cho khách.
+Đơn vị vận chuyển giao hàng; khách nhận và xác nhận. COD được thu hộ và đối soát sau.
+Đơn hoàn tất; hệ thống mời khách đánh giá sản phẩm.
+2.2.2. Quy trình thanh toán, đổi trả và hoàn tiền
+Khách chọn phương thức thanh toán: COD, thẻ ATM/quốc tế, QR, ví điện tử.
+Với thanh toán trực tuyến, cổng thanh toán xử lý giao dịch và gửi kết quả về hệ thống (callback); hệ thống cập nhật trạng thái và gửi hóa đơn điện tử/biên nhận.
+Với COD, đơn vị vận chuyển thu tiền khi giao; kế toán đối soát và nhận tiền chuyển về theo chu kỳ.
+Trong thời hạn quy định, khách có thể yêu cầu hủy, đổi hoặc trả hàng kèm lý do và hình ảnh. Nhân viên CSKH xem xét theo chính sách:
+Chấp nhận: tạo phiếu trả hàng, đơn vị vận chuyển lấy hàng, kho kiểm tra tình trạng.
+Từ chối: thông báo kèm lý do.
+Sau khi kho xác nhận hàng trả hợp lệ, kế toán thực hiện hoàn tiền về phương thức thanh toán gốc (hoặc điểm/voucher); khách nhận thông báo hoàn tiền.
+Mọi thay đổi trạng thái đơn, thanh toán và hoàn tiền được cập nhật trên trang “Đơn hàng của tôi”.
+Mở rộng tùy chọn – Thanh toán trả góp: khi bật tính năng này, khách chọn gói trả góp (đối tác tài chính, kỳ hạn, lãi suất); hồ sơ được thẩm định và ký hợp đồng điện tử bằng OTP; hệ thống nhắc hạn thanh toán trước 5–7 ngày và ghi nhận các kỳ thanh toán, phí trễ hạn theo quy định. Phần này được tách thành module riêng để không làm phức tạp luồng mua hàng cơ bản.
+PHẦN 3: MÔ HÌNH HÓA YÊU CẦU
+3.1. Use Case
+Tác nhân: Khách hàng, Nhân viên CSKH, Nhân viên kho, Nhân viên sản phẩm, Kế toán, Quản trị viên, Cổng thanh toán, Đơn vị vận chuyển.
+Tác nhân
+Use case chính
+Khách hàng
+Đăng ký/Đăng nhập, Tìm kiếm – lọc sản phẩm, Xem chi tiết, So sánh, Quản lý giỏ hàng, Đặt hàng, Thanh toán, Theo dõi đơn, Hủy/đổi/trả, Đánh giá, Chat
+NV CSKH
+Xác nhận đơn, Xử lý đổi trả, Trả lời hỏi đáp/chat
+NV kho
+Quản lý tồn kho, Đóng gói và bàn giao vận chuyển
+NV sản phẩm
+Quản lý sản phẩm, danh mục, khuyến mãi
+Kế toán
+Đối soát thanh toán, Hoàn tiền, Báo cáo doanh thu
+Quản trị viên
+Phân quyền, Cấu hình hệ thống, Xem báo cáo
+Cổng thanh toán / Vận chuyển
+Xử lý giao dịch; Giao hàng, cập nhật trạng thái
+
+Quan hệ include/extend chính: “Đặt hàng” include “Đăng nhập”, “Chọn địa chỉ”, “Thanh toán”; “Thanh toán” extend “Áp dụng voucher”; “Đặt hàng” extend “Thanh toán trả góp” (tùy chọn).
+3.2. Đặc tả Use Case
+Use Case 1: Đặt hàng online
+Mục
+Nội dung
+Tên
+Đặt hàng online
+Mô tả
+Khách hàng đặt mua sản phẩm trên website
+Tác nhân
+Khách hàng, Hệ thống, Cổng thanh toán
+Ưu tiên
+Must have
+Tiền điều kiện
+Khách hàng đã có sản phẩm trong giỏ hàng (hoặc chọn “Mua ngay”)
+Hậu điều kiện
+Đơn hàng được tạo thành công; tồn kho được giữ; khách nhận thông báo xác nhận
+Basic path
+1. Khách hàng mở giỏ hàng và chọn các sản phẩm cần mua.<br>2. Hệ thống yêu cầu đăng nhập (nếu chưa).<br>3. Khách hàng chọn hoặc nhập địa chỉ nhận hàng.<br>4. Hệ thống hiển thị các phương thức vận chuyển và phí.<br>5. Khách hàng chọn vận chuyển và áp dụng voucher (nếu có).<br>6. Hệ thống tính tổng thanh toán.<br>7. Khách hàng chọn phương thức thanh toán và nhấn “Đặt hàng”.<br>8. Hệ thống kiểm tra tồn kho và tạo đơn hàng.<br>9. Nếu thanh toán trực tuyến, hệ thống chuyển khách sang cổng thanh toán và nhận kết quả.<br>10. Hệ thống gửi thông báo đặt hàng thành công. Use case kết thúc.
+Alternative path
+5a. Voucher không hợp lệ hoặc hết hạn: hệ thống báo lỗi, khách nhập lại hoặc bỏ qua, tiếp tục bước 6.<br>9a. Khách chọn COD: bỏ qua bước thanh toán trực tuyến, đơn chuyển trạng thái “Chờ xác nhận”.
+Exception path
+8a. Sản phẩm hết hàng: hệ thống thông báo và yêu cầu khách cập nhật giỏ hàng.<br>9b. Thanh toán thất bại/hết thời hạn: hệ thống cho phép thanh toán lại hoặc hủy đơn và trả tồn kho.
+Business rules
+Mỗi đơn chỉ gồm sản phẩm còn hàng; voucher chỉ áp dụng khi đạt điều kiện tối thiểu; giữ tồn kho tối đa theo thời hạn thanh toán
+Yêu cầu phi chức năng
+Tải trang thanh toán ≤ 3 giây; xử lý đặt hàng ≤ 2 phút; bảo mật thông tin thanh toán
+
+Use Case 2: Thanh toán trực tuyến
+Mục
+Nội dung
+Tên
+Thanh toán trực tuyến
+Mô tả
+Khách hàng thanh toán đơn hàng qua thẻ, QR hoặc ví điện tử
+Tác nhân
+Khách hàng, Hệ thống, Cổng thanh toán
+Ưu tiên
+Must have
+Tiền điều kiện
+Đơn hàng ở trạng thái “Chờ thanh toán”
+Hậu điều kiện
+Đơn hàng chuyển “Đã thanh toán”; biên nhận/hóa đơn được gửi
+Basic path
+1. Hệ thống chuyển khách hàng đến cổng thanh toán với thông tin đơn.<br>2. Khách hàng chọn phương thức và nhập thông tin thanh toán trên cổng.<br>3. Cổng thanh toán xác thực giao dịch (OTP/3D Secure).<br>4. Cổng thanh toán gửi kết quả “thành công” về hệ thống.<br>5. Hệ thống kiểm tra tính hợp lệ của kết quả (chữ ký, số tiền).<br>6. Hệ thống cập nhật trạng thái đơn và lưu giao dịch.<br>7. Hệ thống gửi thông báo và hóa đơn cho khách hàng. Use case kết thúc.
+Alternative path
+2a. Khách đổi phương thức thanh toán: quay lại bước 2.
+Exception path
+3a. Xác thực sai quá số lần cho phép: giao dịch bị hủy, khách có thể thử lại.<br>4a. Cổng thanh toán trả kết quả “thất bại”: hệ thống giữ đơn ở “Chờ thanh toán” và thông báo lỗi.<br>5a. Dữ liệu callback không hợp lệ: hệ thống từ chối và ghi log cảnh báo.
+Business rules
+Không lưu số thẻ thô; mỗi giao dịch có mã tham chiếu duy nhất để đối soát
+Yêu cầu phi chức năng
+Bảo mật 2 lớp; cập nhật trạng thái ≤ 3 phút
+
+Use Case 3: Đổi trả và hoàn tiền
+Mục
+Nội dung
+Tên
+Yêu cầu đổi trả / hoàn tiền
+Tác nhân
+Khách hàng, NV CSKH, NV kho, Kế toán
+Tiền điều kiện
+Đơn hàng đã giao và còn trong thời hạn đổi trả
+Hậu điều kiện
+Yêu cầu được xử lý; hoàn tiền (nếu được duyệt) về phương thức gốc
+Basic path
+1. Khách chọn đơn hàng và tạo yêu cầu trả hàng, nêu lý do, đính kèm ảnh.<br>2. NV CSKH xem xét và duyệt yêu cầu.<br>3. Hệ thống tạo phiếu trả hàng và hẹn đơn vị vận chuyển lấy hàng.<br>4. NV kho nhận hàng và kiểm tra tình trạng.<br>5. Kế toán thực hiện hoàn tiền.<br>6. Hệ thống thông báo kết quả cho khách. Use case kết thúc.
+Exception path
+2a. Yêu cầu bị từ chối: hệ thống thông báo kèm lý do.<br>4a. Hàng trả không đạt điều kiện: NV kho ghi nhận, CSKH liên hệ khách xử lý.
+
+3.3. Mô hình dữ liệu (ERD)
+3.3.1. Xác định thực thể và mối quan hệ
+Nhóm người dùng và địa chỉ
+KhachHang (MaKhachHang, HoTen, Email, SoDienThoai, MatKhauHash, NgaySinh, GioiTinh, DiemTichLuy, NgayTao)
+DiaChi (MaDiaChi, MaKhachHang, TenNguoiNhan, SoDienThoai, DiaChiChiTiet, PhuongXa, QuanHuyen, TinhThanh, MacDinh)
+NhanVien (MaNhanVien, HoTen, Email, VaiTro, TrangThai)
+Nhóm sản phẩm
+DanhMuc (MaDanhMuc, TenDanhMuc, MaDanhMucCha)
+ThuongHieu (MaThuongHieu, TenThuongHieu)
+SanPham (MaSanPham, TenSanPham, MoTa, MaDanhMuc, MaThuongHieu, TrangThai, NgayTao)
+BienTheSanPham (MaBienThe, MaSanPham, SKU, MauSac, DungLuong/KichCo, GiaBan, SoLuongTon)
+HinhAnhSanPham (MaHinhAnh, MaSanPham, DuongDan, ThuTu)
+Nhóm mua hàng
+GioHang (MaGioHang, MaKhachHang, NgayCapNhat)
+ChiTietGioHang (MaGioHang, MaBienThe, SoLuong)
+Voucher (MaVoucher, Code, LoaiGiam, GiaTriGiam, DonToiThieu, NgayBatDau, NgayKetThuc, SoLuotSuDung)
+DonHang (MaDonHang, MaKhachHang, MaDiaChi, MaVoucher, TongTienHang, PhiVanChuyen, TienGiam, TongThanhToan, TrangThai, NgayDat)
+ChiTietDonHang (MaDonHang, MaBienThe, SoLuong, DonGia, ThanhTien)
+Nhóm thanh toán và vận chuyển
+ThanhToan (MaThanhToan, MaDonHang, PhuongThuc, SoTien, TrangThai, MaGiaoDichCong, NgayThanhToan)
+VanChuyen (MaVanChuyen, MaDonHang, DonViVanChuyen, MaVanDon, TrangThai, NgayGiao)
+TraHang (MaTraHang, MaDonHang, LyDo, TrangThai, SoTienHoan, NgayTao)
+Nhóm tương tác
+DanhGia (MaDanhGia, MaKhachHang, MaSanPham, MaDonHang, SoSao, NoiDung, NgayDanhGia)
+ThongBao (MaThongBao, MaKhachHang, NoiDung, DaDoc, NgayGui)
+Mở rộng (tùy chọn) – Trả góp
+GoiTraGop (MaGoiTraGop, DoiTacTaiChinh, LaiSuat, KyHan, TraTruocToiThieu)
+HoSoTraGop (MaHoSo, MaDonHang, MaGoiTraGop, SoTienTraTruoc, TrangThaiDuyet, NgayKyHopDong)
+KyThanhToanTraGop (MaKy, MaHoSo, KyThu, NgayDenHan, SoTien, SoTienPhat, TrangThai)
+Các mối quan hệ chính
+Quan hệ
+Bản số
+Ghi chú
+KhachHang – DiaChi
+1 – n
+Mỗi khách có nhiều địa chỉ
+KhachHang – GioHang
+1 – 1
+Mỗi khách một giỏ hàng
+GioHang – BienTheSanPham
+n – n
+Qua ChiTietGioHang
+KhachHang – DonHang
+1 – n
+
+
+DonHang – BienTheSanPham
+n – n
+Qua ChiTietDonHang
+DonHang – ThanhToan
+1 – n
+Cho phép thanh toán lại / thanh toán nhiều lần
+DonHang – VanChuyen
+1 – n
+Hỗ trợ tách kiện
+DonHang – Voucher
+n – 1
+Mỗi đơn áp dụng tối đa 1 voucher
+DonHang – TraHang
+1 – n
+
+
+DanhMuc – SanPham
+1 – n
+DanhMuc có thể phân cấp (tự tham chiếu)
+ThuongHieu – SanPham
+1 – n
+
+
+SanPham – BienTheSanPham
+1 – n
+
+
+KhachHang – SanPham
+n – n
+Qua DanhGia (kèm điều kiện đã mua)
+DonHang – HoSoTraGop
+1 – 0..1
+Chỉ khi chọn trả góp
+HoSoTraGop – KyThanhToanTraGop
+1 – n
+Mỗi kỳ một bản ghi
+
+Lưu ý thiết kế so với ERD trong báo cáo gốc: ERD gốc đặt nhiều quan hệ 1–1 (ví dụ Đơn mua hàng – Tiến trình trả góp) và để thuộc tính “Tên sản phẩm”, “Thương hiệu” trong cả hai bảng đơn hàng và chi tiết đơn, gây dư thừa dữ liệu. Bản này tách biến thể sản phẩm, chuẩn hóa danh mục/thương hiệu, lưu đơn giá tại thời điểm mua trong ChiTietDonHang, và cho phép quan hệ 1–n ở thanh toán/vận chuyển để phản ánh đúng thực tế.
+3.3.2. Sơ đồ ERD (Mermaid)
+PHỤ LỤC: BẢNG ĐỐI CHIẾU VỚI BÁO CÁO GỐC
+Nội dung báo cáo gốc (FPT Shop trả góp)
+Nội dung mới (website TMĐT)
+Phạm vi: quy trình trả góp 0% và trả góp qua thẻ
+Phạm vi: toàn bộ chu trình bán hàng; trả góp là module mở rộng
+Stakeholder: công ty tài chính, nhân viên thẩm định hồ sơ
+Bổ sung kho, kế toán, nhân viên sản phẩm, cổng thanh toán, vận chuyển; công ty tài chính thành đối tác tùy chọn
+FR11 Đặt mua (mua ngay / trả góp 0% / trả góp thẻ)
+FR09–FR12 Giỏ hàng, khuyến mãi, đặt hàng, thanh toán đa phương thức
+FR18–FR19 Nhắc hẹn và theo dõi trả góp
+FR14, FR19 Theo dõi đơn, thông báo; nhắc hạn trả góp nằm trong module mở rộng
+ERD 6–7 bảng xoay quanh trả góp
+ERD khoảng 20 thực thể phục vụ bán hàng; trả góp gồm 3 bảng tùy chọn
+
+

@@ -1,0 +1,293 @@
+{
+  "fixture_id": "neu-ui-demo-v1",
+  "description": "Dữ liệu minh họa liên kết; không có giao dịch hoặc khách hàng thực tế.",
+  "customers": [
+    {
+      "id": "lan",
+      "name": "Khách demo – Lan",
+      "email": "demo.lan@example.test",
+      "phone": "0900000001",
+      "address": "12 Đường Minh Họa, phường Demo, Hà Nội"
+    },
+    {
+      "id": "minh",
+      "name": "Khách demo – Minh",
+      "email": "demo.minh@example.test",
+      "phone": "0900000002",
+      "address": "25 Đường Mẫu, phường Demo, Đà Nẵng"
+    },
+    {
+      "id": "an",
+      "name": "Khách demo – An",
+      "email": "demo.an@example.test",
+      "phone": "0900000003",
+      "address": "38 Đường Thử Nghiệm, phường Demo, TP. Hồ Chí Minh"
+    }
+  ],
+  "products": [
+    {
+      "id": "book-air",
+      "name": "NEU Book Air 14",
+      "category": "laptop",
+      "variants": [
+        {
+          "sku": "NEU-0001-01",
+          "color": "Xám",
+          "storage": "Tiêu chuẩn"
+        },
+        {
+          "sku": "NEU-0001-02",
+          "color": "Bạc",
+          "storage": "Nâng cấp dung lượng"
+        }
+      ]
+    },
+    {
+      "id": "phone-s1",
+      "name": "NEU Phone S1",
+      "category": "phone",
+      "variants": [
+        {
+          "sku": "NEU-0002-01",
+          "color": "Xanh",
+          "storage": "Tiêu chuẩn"
+        }
+      ]
+    },
+    {
+      "id": "studio",
+      "name": "NEU Sound Studio",
+      "category": "audio",
+      "variants": [
+        {
+          "sku": "NEU-0003-01",
+          "color": "Xanh",
+          "storage": "Tiêu chuẩn"
+        }
+      ]
+    },
+    {
+      "id": "keys",
+      "name": "NEU Keys K2",
+      "category": "accessory",
+      "variants": [
+        {
+          "sku": "NEU-0004-01",
+          "color": "Xám",
+          "storage": "Tiêu chuẩn"
+        }
+      ]
+    },
+    {
+      "id": "book-pro",
+      "name": "NEU Book Pro 16",
+      "category": "laptop",
+      "variants": [
+        {
+          "sku": "NEU-0005-01",
+          "color": "Xám",
+          "storage": "Tiêu chuẩn"
+        }
+      ]
+    },
+    {
+      "id": "phone-plus",
+      "name": "NEU Phone S1 Plus",
+      "category": "phone",
+      "variants": [
+        {
+          "sku": "NEU-0006-01",
+          "color": "Xanh",
+          "storage": "Tiêu chuẩn"
+        }
+      ]
+    },
+    {
+      "id": "buds",
+      "name": "NEU Buds Mini",
+      "category": "audio",
+      "variants": [
+        {
+          "sku": "NEU-0007-01",
+          "color": "Xanh",
+          "storage": "Tiêu chuẩn"
+        }
+      ]
+    },
+    {
+      "id": "hub",
+      "name": "NEU Hub Connect",
+      "category": "accessory",
+      "variants": [
+        {
+          "sku": "NEU-0008-01",
+          "color": "Xám",
+          "storage": "Tiêu chuẩn"
+        }
+      ]
+    }
+  ],
+  "orders": [
+    {
+      "id": "SAMPLE-001",
+      "customer_id": "lan",
+      "days_ago": 12,
+      "status": "Hoàn tất",
+      "payment_method": "qr",
+      "items": [
+        {
+          "sku": "NEU-0001-01",
+          "quantity": 1
+        },
+        {
+          "sku": "NEU-0008-01",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "SAMPLE-002",
+      "customer_id": "minh",
+      "days_ago": 9,
+      "status": "Hoàn tất",
+      "payment_method": "card",
+      "items": [
+        {
+          "sku": "NEU-0002-01",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "SAMPLE-003",
+      "customer_id": "an",
+      "days_ago": 6,
+      "status": "Hoàn tất",
+      "payment_method": "cod",
+      "items": [
+        {
+          "sku": "NEU-0003-01",
+          "quantity": 1
+        },
+        {
+          "sku": "NEU-0004-01",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "SAMPLE-004",
+      "customer_id": "lan",
+      "days_ago": 3,
+      "status": "Hoàn tất",
+      "payment_method": "wallet",
+      "items": [
+        {
+          "sku": "NEU-0007-01",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "id": "SAMPLE-005",
+      "customer_id": "minh",
+      "days_ago": 1,
+      "status": "Đang giao",
+      "payment_method": "cod",
+      "items": [
+        {
+          "sku": "NEU-0005-01",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "SAMPLE-006",
+      "customer_id": "an",
+      "days_ago": 0,
+      "status": "Đang chuẩn bị",
+      "payment_method": "qr",
+      "items": [
+        {
+          "sku": "NEU-0006-01",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "SAMPLE-007",
+      "customer_id": "lan",
+      "days_ago": 0,
+      "status": "Chờ xác nhận",
+      "payment_method": "cod",
+      "items": [
+        {
+          "sku": "NEU-0004-01",
+          "quantity": 1
+        }
+      ]
+    }
+  ],
+  "reviews": [
+    {
+      "customer_id": "lan",
+      "order_id": "SAMPLE-001",
+      "rating": 5,
+      "content": "[Minh họa] Laptop đáp ứng nhu cầu học tập và làm việc với tài liệu.",
+      "reply": "Cảm ơn bạn đã trải nghiệm bản demo NEU SHOP."
+    },
+    {
+      "customer_id": "minh",
+      "order_id": "SAMPLE-002",
+      "rating": 4,
+      "content": "[Minh họa] Màn hình dễ nhìn, lựa chọn phiên bản rõ ràng.",
+      "reply": ""
+    },
+    {
+      "customer_id": "an",
+      "order_id": "SAMPLE-003",
+      "rating": 5,
+      "content": "[Minh họa] Tai nghe phù hợp khi cần tập trung học tập.",
+      "reply": ""
+    },
+    {
+      "customer_id": "lan",
+      "order_id": "SAMPLE-004",
+      "rating": 4,
+      "content": "[Minh họa] Nhỏ gọn, thuận tiện để mang theo.",
+      "reply": ""
+    }
+  ],
+  "messages": [
+    {
+      "customer_id": "lan",
+      "content": "[Minh họa] Tôi muốn hỏi thêm về cách sử dụng hub USB-C."
+    },
+    {
+      "customer_id": "minh",
+      "content": "[Minh họa] Tôi có thể theo dõi mã vận đơn ở đâu?"
+    }
+  ],
+  "flash_sales": [
+    {
+      "sku": "NEU-0001-01",
+      "discount": 1000000
+    },
+    {
+      "sku": "NEU-0003-01",
+      "discount": 200000
+    },
+    {
+      "sku": "NEU-0007-01",
+      "discount": 100000
+    }
+  ],
+  "returns": [
+    {
+      "order_id": "SAMPLE-004",
+      "customer_id": "lan",
+      "reason": "[Minh họa] Tôi muốn trả toàn bộ đơn vì không phù hợp nhu cầu.",
+      "status": "Chờ duyệt"
+    }
+  ]
+}

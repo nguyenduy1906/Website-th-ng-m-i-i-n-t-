@@ -1,0 +1,9 @@
+{% from 'customer/macros.html' import field, csrf_field, icon %}
+{% if errors.general %}<div class="error-notice" role="alert">{{ errors.general }}</div>{% endif %}
+<form action="{{ '/register' if mode == 'register' else '/forgot-password' if mode == 'forgot' else '/login' }}" method="post">{{ csrf_field(csrf) }}
+{% if request.url.path.startswith('/admin') %}<input type="hidden" name="portal" value="admin">{% endif %}
+{% if mode == 'register' %}{{ field('name','Họ và tên',values,errors,autocomplete='name',maxlength=80) }}{% endif %}
+{{ field('email','Email',values,errors,type='email',autocomplete='email',maxlength=200) }}
+{% if mode != 'forgot' %}{{ field('password','Mật khẩu',values,errors,type='password',autocomplete='new-password' if mode == 'register' else 'current-password',maxlength=128,hint='Từ 8 đến 128 ký tự.' if mode == 'register' else '') }}{% endif %}
+{% if mode == 'register' %}{{ field('confirm','Nhập lại mật khẩu',values,errors,type='password',autocomplete='new-password',maxlength=128) }}{% endif %}
+<button class="button full">{{ 'Tạo tài khoản' if mode == 'register' else 'Gửi mã khôi phục' if mode == 'forgot' else 'Đăng nhập' }} {{ icon('arrow',18) }}</button></form>

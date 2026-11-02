@@ -1,0 +1,17 @@
+[
+  {
+    "theme": "NEU SHOP locked DESIGN.md",
+    "shape": "catalogue",
+    "hero": "compact split product stage",
+    "nav": "logo, prominent search, account, cart, category row; mobile dialogs",
+    "footer": "shop navigation and explicit local demo disclosure",
+    "imagery": "authored local SVG product illustrations",
+    "entry": "app/templates/home.html",
+    "signature": "NEU Book laptop stage for the study and work collection",
+    "sections": ["product banner", "categories", "product grid", "accessories banner", "footer"],
+    "waived": ["7b: locked white surface token from DESIGN.md"],
+    "prompt": "NEU SHOP full stack local demo using Python, FastAPI and HTML",
+    "review": {"type": "fresh-context subagent", "verdict": "fix", "findings": 2, "resolved": 2, "changes": ["earbuds and USB hub illustrations match product names", "hero heading identifies study setup use"], "hero_review": "not separately performed"},
+    "verification": {"backend_tests": 14, "browser_page_viewports": 60, "widths": [320, 375, 768, 1280], "floor_failures": 0, "open_reflex_findings": 0}
+  }
+]
