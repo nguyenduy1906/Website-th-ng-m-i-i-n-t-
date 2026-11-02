@@ -1,4 +1,5 @@
 import hmac
+import hashlib
 import html
 import re
 import secrets
@@ -13,11 +14,19 @@ from markupsafe import Markup
 from .db import DB_PATH, IMAGES, ROOT, connect, get_settings
 
 templates = Jinja2Templates(directory=ROOT / "app/templates")
-METHODS = {"cod": "Thanh toán khi nhận hàng", "qr": "QR demo", "card": "Thẻ ATM / quốc tế demo", "wallet": "Ví điện tử demo"}
-SHIPPING = {"standard": ("Giao tiêu chuẩn demo", 30000), "express": ("Giao nhanh demo", 50000), "pickup": ("Nhận tại điểm demo", 0)}
+METHODS = {"cod": "Thanh toán khi nhận hàng", "qr": 'QR ', "card": 'Thẻ ATM / quốc tế ', "wallet": 'Ví điện tử '}
+SHIPPING = {"standard": ('Giao tiêu chuẩn ', 30000), "express": ('Giao nhanh ', 50000), "pickup": ('Nhận tại điểm ', 0)}
 STATUSES = ("Chờ thanh toán", "Chờ xác nhận", "Đang chuẩn bị", "Đang giao", "Hoàn tất", "Đã hủy", "Đã trả hàng")
 TRANSITIONS = {"Chờ xác nhận": ("Đang chuẩn bị", "Đã hủy"), "Đang chuẩn bị": ("Đang giao", "Đã hủy"), "Đang giao": ("Hoàn tất",)}
 UPLOAD_DIR = DB_PATH.parent / "uploads"
+
+
+def require_signed_contract(db, order_id):
+    contract = db.execute('SELECT status,snapshot,document_hash FROM sales_contracts WHERE order_id=?', (order_id,)).fetchone()
+    if not contract or contract['status'] != 'signed':
+        raise HTTPException(409, 'Khách hàng cần đọc và xác nhận hợp đồng bằng OTP trước khi thanh toán hoặc duyệt đơn.')
+    if not hmac.compare_digest(hashlib.sha256(contract['snapshot'].encode()).hexdigest(), contract['document_hash']):
+        raise HTTPException(409, 'Nội dung hợp đồng không toàn vẹn. Không thể thanh toán hoặc duyệt đơn.')
 
 
 def money(value):
@@ -64,6 +73,15 @@ def richtext(value):
 
 
 templates.env.filters['richtext'] = richtext
+
+
+def news_content(value):
+    index = iter(range(1, 10000))
+    return Markup(re.sub(r'<h2>', lambda _: '<h2 id="article-section-' + str(next(index)) + '">', str(richtext(value))))
+
+
+templates.env.filters['news_content'] = news_content
+
 
 
 def user_of(request):
@@ -218,7 +236,6 @@ def render(request, template, status_code=200, **context):
         category_tree = {slug: [row for row in category_rows if row['parent_slug']==slug] for slug in categories}
         brands = db.execute("SELECT * FROM brands WHERE active=1 ORDER BY name").fetchall()
         unread = db.execute("SELECT COUNT(*) FROM notifications WHERE user_id=? AND is_read=0", (user["id"],)).fetchone()[0] if user else 0
-        demo_loaded = db.execute("SELECT 1 FROM demo_imports LIMIT 1").fetchone() is not None
         ceiling = db.execute("SELECT COALESCE(MAX(price),1000000) FROM variants").fetchone()[0]
         admin_alerts = db.execute("SELECT COUNT(*) FROM orders WHERE status='Chờ xác nhận'").fetchone()[0] if user and user["role"] == "admin" else 0
         site = get_settings(db)
@@ -229,7 +246,7 @@ def render(request, template, status_code=200, **context):
             "cart_count": sum(v["quantity"] for v in read_cart(request).values()), "unread": unread,
             "flash": request.session.pop("flash", None),
             "title": "NEU SHOP", "errors": {}, "values": {}, "section": "", "account_section": ""}
-    base.update(demo_loaded=demo_loaded, price_ceiling=max(1000000, ((ceiling+99999)//100000)*100000), admin_alerts=admin_alerts)
+    base.update(price_ceiling=max(1000000, ((ceiling+99999)//100000)*100000), admin_alerts=admin_alerts)
     base.update(site=site,site_pages=site_pages,category_labels=category_labels,category_tree=category_tree,visits=visits)
     base.update(context)
     return templates.TemplateResponse(request=request, name=template, context=base, status_code=status_code)

@@ -47,7 +47,7 @@ def _upgrade_schema(db):
         return
     additions = {
         "users": {"phone": "TEXT NOT NULL DEFAULT ''", "birth_date": "TEXT NOT NULL DEFAULT ''", "gender": "TEXT NOT NULL DEFAULT ''", "points": "INTEGER NOT NULL DEFAULT 0", "active": "INTEGER NOT NULL DEFAULT 1", "email_verified": "INTEGER NOT NULL DEFAULT 1", "otp_enabled": "INTEGER NOT NULL DEFAULT 0", "auth_rev": "INTEGER NOT NULL DEFAULT 0"},
-        "products": {"brand_id": "INTEGER REFERENCES brands(id)", "warranty": "TEXT NOT NULL DEFAULT 'Bảo hành mô phỏng 12 tháng'", "featured": "INTEGER NOT NULL DEFAULT 0", "media": "TEXT NOT NULL DEFAULT ''"},
+        "products": {"brand_id": "INTEGER REFERENCES brands(id)", "warranty": "TEXT NOT NULL DEFAULT 'Bảo hành thử nghiệm 12 tháng'", "featured": "INTEGER NOT NULL DEFAULT 0", "media": "TEXT NOT NULL DEFAULT ''"},
         "orders": {"subtotal": "INTEGER NOT NULL DEFAULT 0", "shipping_fee": "INTEGER NOT NULL DEFAULT 0", "discount": "INTEGER NOT NULL DEFAULT 0", "voucher_id": "INTEGER REFERENCES vouchers(id)", "receive_method": "TEXT NOT NULL DEFAULT 'delivery'", "shipping_method": "TEXT NOT NULL DEFAULT 'standard'", "payment_method": "TEXT NOT NULL DEFAULT 'cod'", "payment_status": "TEXT NOT NULL DEFAULT 'Chưa thanh toán'", "tracking_code": "TEXT NOT NULL DEFAULT ''", "expires_at": "INTEGER", "completed_at": "TEXT", "points_awarded": "INTEGER NOT NULL DEFAULT 0"},
         "order_items": {"variant_id": "INTEGER REFERENCES variants(id)", "variant_label": "TEXT NOT NULL DEFAULT ''", "image": "TEXT NOT NULL DEFAULT ''"},
     }
@@ -99,8 +99,8 @@ def _upgrade_schema(db):
     db.execute("INSERT INTO vouchers(code,kind,value,min_total,max_discount,start_date,end_date,usage_limit) VALUES('NEU100','fixed',100000,1000000,0,date('now','+7 hours','-1 day'),date('now','+7 hours','+90 days'),100)")
     db.execute("INSERT INTO vouchers(code,kind,value,min_total,max_discount,start_date,end_date,usage_limit) VALUES('WELCOME5','percent',5,500000,300000,date('now','+7 hours','-1 day'),date('now','+7 hours','+90 days'),100)")
     db.executemany("INSERT INTO articles(title,summary,content) VALUES(?,?,?)", [
-        ("Chọn laptop cho góc học tập", "Bắt đầu từ nhu cầu, bộ nhớ và kích thước màn hình.", "Xác định các phần mềm bạn sử dụng trước khi chọn cấu hình.\n\nƯu tiên dung lượng RAM phù hợp cho đa nhiệm, SSD đủ cho tài liệu và màn hình dễ đọc. So sánh thông số trong trang sản phẩm để lựa chọn.\n\nĐây là bài hướng dẫn mẫu trong bản demo NEU SHOP."),
-        ("Mua sắm và đổi trả trong bản demo", "Các bước thử đặt hàng, theo dõi và yêu cầu trả hàng.", "Đăng nhập, chọn biến thể và thêm sản phẩm vào giỏ. Tại bước thanh toán, chọn giao hàng hoặc nhận tại cửa hàng mô phỏng.\n\nSau khi đơn hoàn tất, bạn có thể đánh giá hoặc yêu cầu trả toàn bộ đơn trong 7 ngày. Admin xét duyệt, xác nhận nhận hàng và hoàn tiền mô phỏng.\n\nKhông có giao hàng hoặc thu tiền thực tế."),
+        ("Chọn laptop cho góc học tập", "Bắt đầu từ nhu cầu, bộ nhớ và kích thước màn hình.", 'Xác định các phần mềm bạn sử dụng trước khi chọn cấu hình.\n\nƯu tiên dung lượng RAM phù hợp cho đa nhiệm, SSD đủ cho tài liệu và màn hình dễ đọc. So sánh thông số trong trang sản phẩm để lựa chọn.\n\nĐây là bài hướng dẫn mẫu trong bản  NEU SHOP.'),
+        ('Mua sắm và đổi trả trong bản ', "Các bước thử đặt hàng, theo dõi và yêu cầu trả hàng.", 'Đăng nhập, chọn biến thể và thêm sản phẩm vào giỏ. Tại bước thanh toán, chọn giao hàng hoặc nhận tại cửa hàng thử nghiệm.\n\nSau khi đơn hoàn tất, bạn có thể đánh giá hoặc yêu cầu trả toàn bộ đơn trong 7 ngày. Admin xét duyệt, xác nhận nhận hàng và hoàn tiền thử nghiệm.\n\nKhông có giao hàng hoặc thu tiền thực tế.'),
     ])
     db.execute("INSERT INTO schema_versions(version) VALUES(2)")
 
@@ -220,7 +220,7 @@ def _upgrade_portal_schema(db):
     }.items())
     db.executemany('INSERT OR IGNORE INTO site_pages(slug,title,summary,body) VALUES(?,?,?,?)', [
         ('about', 'Về NEU SHOP', 'Tìm hiểu thiết bị, chọn đúng nhu cầu.', '## Giới thiệu\nNEU SHOP là dự án website bán đồ công nghệ, giúp bạn khám phá laptop, điện thoại, âm thanh và phụ kiện trong cùng một trải nghiệm.\n\n## Sứ mệnh\nGiúp người dùng dễ tìm kiếm, so sánh cấu hình và hiểu rõ thông tin trước khi lựa chọn thiết bị.\n\n## Tầm nhìn\nXây dựng trải nghiệm mua sắm rõ ràng, thuận tiện và nhất quán từ lúc tìm sản phẩm đến khi theo dõi đơn hàng.\n\n## Phạm vi hiện tại\nWebsite phục vụ học tập và trình diễn trên local. Giá tham khảo, đơn hàng, thanh toán và giao nhận không phải giao dịch thương mại thực tế.'),
-        ('services', 'Dịch vụ & hỗ trợ', 'Mỗi bước mua sắm đều có thông tin để bạn theo dõi.', '## Tư vấn lựa chọn\nTìm kiếm theo từ khóa, danh mục, thương hiệu và ngân sách. So sánh tối đa ba sản phẩm và đặt câu hỏi ngay trên trang chi tiết.\n\n## Đặt hàng & theo dõi\nQuản lý giỏ hàng, chọn địa chỉ, áp dụng voucher và theo dõi lịch sử xử lý đơn trong tài khoản.\n\n## Hậu mãi\nGửi yêu cầu trả hàng trong thời hạn của chính sách demo; theo dõi phản hồi và kết quả xử lý.\n\n## Liên hệ\nGửi biểu mẫu liên hệ công khai hoặc đăng nhập để trao đổi với admin trong mục Hỗ trợ khách hàng.'),
+        ('services', 'Dịch vụ & hỗ trợ', 'Mỗi bước mua sắm đều có thông tin để bạn theo dõi.', '## Tư vấn lựa chọn\nTìm kiếm theo từ khóa, danh mục, thương hiệu và ngân sách. So sánh tối đa ba sản phẩm và đặt câu hỏi ngay trên trang chi tiết.\n\n## Đặt hàng & theo dõi\nQuản lý giỏ hàng, chọn địa chỉ, áp dụng voucher và theo dõi lịch sử xử lý đơn trong tài khoản.\n\n## Hậu mãi\nGửi yêu cầu trả hàng trong thời hạn của chính sách ; theo dõi phản hồi và kết quả xử lý.\n\n## Liên hệ\nGửi biểu mẫu liên hệ công khai hoặc đăng nhập để trao đổi với admin trong mục Hỗ trợ khách hàng.'),
     ])
     db.executemany('INSERT OR IGNORE INTO article_topics(name) VALUES(?)', [('Cẩm nang',), ('Tin công nghệ',), ('Mua sắm & hậu mãi',)])
     topic = db.execute("SELECT id FROM article_topics WHERE name='Cẩm nang'").fetchone()[0]
@@ -299,11 +299,11 @@ def import_catalog(path):
             brand_id = db.execute('SELECT id FROM brands WHERE name=?', (brand,)).fetchone()[0]
             description = product['name'] + '\n\n' + product['specs']
             pid = db.execute('INSERT INTO products(name,category,price,stock,summary,description,specs,brand_id,media,warranty,featured) VALUES(?,?,?,?,?,?,?,?,?,?,?)',
-                (product['name'],product['category'],product['price'],product['stock'],product['summary'],description,product['specs'],brand_id,product['media'],'Bảo hành mô phỏng; tham khảo chính sách tại nguồn sản phẩm',int(added < 8))).lastrowid
+                (product['name'],product['category'],product['price'],product['stock'],product['summary'],description,product['specs'],brand_id,product['media'],'Bảo hành thử nghiệm; tham khảo chính sách tại nguồn sản phẩm',int(added < 8))).lastrowid
             vid = db.execute('INSERT INTO variants(product_id,sku,color,storage,price,stock,media) VALUES(?,?,?,?,?,?,?)',
                 (pid,'CPS-'+product['source_id'],product['color'],product['storage'],product['price'],product['stock'],product['media'])).lastrowid
             db.execute('INSERT INTO product_images(product_id,url,alt) VALUES(?,?,?)', (pid,product['media'],product['name']))
-            db.execute("INSERT INTO inventory_movements(variant_id,quantity,reason) VALUES(?,?,'Tồn đầu mô phỏng — nhập danh mục thực tế')", (vid,product['stock']))
+            db.execute("INSERT INTO inventory_movements(variant_id,quantity,reason) VALUES(?,?,'Tồn đầu thử nghiệm — nhập danh mục thực tế')", (vid,product['stock']))
             db.execute('INSERT INTO product_sources VALUES(?,?,?,?,?,?,?)', (pid,product['source_id'],product['source_url'],product['listing_url'],product['image_url'],product['collected_at'],product['image_sha256']))
             added += 1
         if added:
@@ -338,7 +338,7 @@ def seed_ui_demo():
     with connect() as db:
         if db.execute("SELECT 1 FROM demo_imports WHERE name=?", (fixture["fixture_id"],)).fetchone():
             _sync_demo_points(db, fixture["fixture_id"])
-            return "Demo fixture already imported; existing records preserved."
+            return ' fixture already imported; existing records preserved.'
         backup_dir = DB_PATH.parent / "backups"
         backup_dir.mkdir(exist_ok=True)
         backup_path = backup_dir / "before-ui-demo.db"
@@ -351,7 +351,7 @@ def seed_ui_demo():
     with connect() as db:
         db.execute("BEGIN IMMEDIATE")
         if db.execute("SELECT 1 FROM demo_imports WHERE name=?", (fixture["fixture_id"],)).fetchone():
-            return "Demo fixture already imported; no rows changed."
+            return ' fixture already imported; no rows changed.'
         users, orders = {}, {}
         for customer in fixture["customers"]:
             existing = db.execute("SELECT id FROM users WHERE email=?", (customer["email"],)).fetchone()
@@ -365,7 +365,7 @@ def seed_ui_demo():
             for item in sample["items"]:
                 variant = db.execute("SELECT v.*,p.name,p.image,p.category FROM variants v JOIN products p ON p.id=v.product_id WHERE v.sku=?", (item["sku"],)).fetchone()
                 if not variant or variant["stock"] < item["quantity"]:
-                    raise ValueError("Demo SKU missing or insufficient stock: " + item["sku"])
+                    raise ValueError(' SKU missing or insufficient stock: ' + item["sku"])
                 lines.append((variant, item["quantity"]))
                 subtotal += variant["price"] * item["quantity"]
             total = subtotal + 30000
@@ -378,7 +378,7 @@ def seed_ui_demo():
             for variant, quantity in lines:
                 db.execute("INSERT INTO order_items(order_id,product_id,variant_id,name,variant_label,price,quantity,image) VALUES(?,?,?,?,?,?,?,?)", (order_id, variant["product_id"], variant["id"], variant["name"], variant["color"] + " / " + variant["storage"], variant["price"], quantity, f"/static/images/{variant['image'] or variant['category']}.svg"))
                 db.execute("UPDATE variants SET stock=stock-? WHERE id=?", (quantity, variant["id"]))
-                db.execute("INSERT INTO inventory_movements(variant_id,quantity,reason) VALUES(?,?,?)", (variant["id"], -quantity, "Đơn mẫu " + sample["id"]))
+                db.execute("INSERT INTO inventory_movements(variant_id,quantity,reason) VALUES(?,?,?)", (variant["id"], -quantity, 'Đơn thử nghiệm ' + sample["id"]))
             paid = completed or sample["payment_method"] != "cod"
             if completed:
                 points = total // 100000
@@ -387,8 +387,8 @@ def seed_ui_demo():
             db.execute("INSERT INTO payments(order_id,method,amount,status,reference,created_at,paid_at) VALUES(?,?,?,?,?,?,?)", (order_id, sample["payment_method"], total, "Thành công" if paid else "Chờ thanh toán", "DEMO-PAY-" + sample["id"], timestamp, timestamp if paid else None))
             stages = ["Chờ xác nhận", "Đang chuẩn bị", "Đang giao", "Hoàn tất"]
             for stage in stages[:stages.index(sample["status"]) + 1]:
-                db.execute("INSERT INTO order_events(order_id,status,note,created_at) VALUES(?,?,?,?)", (order_id, stage, "Bước xử lý minh họa", timestamp))
-            db.execute("INSERT INTO notifications(user_id,title,content,url) VALUES(?,?,?,?)", (user_id, "Đơn hàng minh họa " + sample["id"], sample["status"], f"/orders/{order_id}"))
+                db.execute("INSERT INTO order_events(order_id,status,note,created_at) VALUES(?,?,?,?)", (order_id, stage, 'Bước xử lý tham khảo', timestamp))
+            db.execute("INSERT INTO notifications(user_id,title,content,url) VALUES(?,?,?,?)", (user_id, 'Đơn hàng tham khảo ' + sample["id"], sample["status"], f"/orders/{order_id}"))
         for review in fixture["reviews"]:
             order_id = orders[review["order_id"]]
             product = db.execute("SELECT product_id FROM order_items WHERE order_id=? ORDER BY id LIMIT 1", (order_id,)).fetchone()
@@ -408,9 +408,9 @@ def seed_ui_demo():
                 if product["category"] == "laptop":
                     urls.append("/static/images/hero-laptop.svg")
                 for index, url in enumerate(urls):
-                    db.execute("INSERT INTO product_images(product_id,url,alt,sort_order) VALUES(?,?,?,?)", (product["id"], url, product["name"] + " — Minh họa " + str(index+1), index))
+                    db.execute("INSERT INTO product_images(product_id,url,alt,sort_order) VALUES(?,?,?,?)", (product["id"], url, product["name"] + ' — Tham khảo ' + str(index+1), index))
         db.execute("INSERT INTO demo_imports(name) VALUES(?)", (fixture["fixture_id"],))
-    return "Imported linked UI demo data. Existing accounts and orders preserved."
+    return 'Imported linked UI data. Existing accounts and orders preserved.'
 
 
 def _sync_demo_points(db, fixture_id):

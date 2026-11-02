@@ -1,3 +1,4 @@
+(() => {
 const currency = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
 const root = document.documentElement;
 root.classList.add('js');
@@ -124,3 +125,29 @@ for (const watcher of document.querySelectorAll('[data-order-watch]')) {
     } catch {}
   }, 5000);
 }
+
+const stickyNavigation = document.querySelector('.site-header,.admin-topbar');
+if (stickyNavigation) {
+  const updateNavigationHeight = () => root.style.setProperty('--sticky-header-height', stickyNavigation.getBoundingClientRect().height + 'px');
+  updateNavigationHeight();
+  if (window.ResizeObserver) new ResizeObserver(updateNavigationHeight).observe(stickyNavigation);
+  window.addEventListener('resize', updateNavigationHeight);
+}
+
+window.__neuRevenueRadiusObserver?.disconnect();
+const revenueChart = document.querySelector('.revenue-chart');
+if (revenueChart) {
+  const updateBarRadius = () => {
+    const matrix = revenueChart.getScreenCTM();
+    if (!matrix?.a || !matrix?.d) return;
+    for (const bar of revenueChart.querySelectorAll('rect')) {
+      bar.setAttribute('rx', 5 / Math.abs(matrix.a));
+      bar.setAttribute('ry', 5 / Math.abs(matrix.d));
+    }
+  };
+  updateBarRadius();
+  window.__neuRevenueRadiusObserver = new ResizeObserver(updateBarRadius);
+  window.__neuRevenueRadiusObserver.observe(revenueChart);
+}
+
+})();

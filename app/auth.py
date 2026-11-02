@@ -26,8 +26,7 @@ def start_challenge(request, user_id, purpose):
 @router.get("/login")
 @router.get("/admin/login")
 def login_page(request: Request):
-    admin = request.url.path.startswith("/admin")
-    return render(request, "admin/login.html" if admin else "customer/auth.html", title="Đăng nhập quản trị" if admin else "Đăng nhập", mode="login", admin_login=admin)
+    return render(request, "customer/auth.html", title="Đăng nhập", mode="login")
 
 
 @router.get("/register")
@@ -55,7 +54,7 @@ async def register(request: Request):
             with connect() as db:
                 user_id = db.execute("INSERT INTO users(name,email,password,email_verified) VALUES(?,?,?,0)", (name, email, password_hash(password))).lastrowid
             start_challenge(request, user_id, "register")
-            return redirect("/verify", request, "Xác thực email bằng mã OTP demo để hoàn tất đăng ký.")
+            return redirect("/verify", request, 'Xác thực email bằng mã OTP để hoàn tất đăng ký.')
         except sqlite3.IntegrityError:
             errors["email"] = "Email đã có tài khoản. Hãy đăng nhập hoặc khôi phục mật khẩu."
     return render(request, "customer/auth.html", 400, title="Tạo tài khoản", mode="register", errors=errors, values={"name": name, "email": email})
@@ -65,11 +64,10 @@ async def register(request: Request):
 async def login(request: Request):
     data = await form_data(request)
     email, password = data.get("email", "").strip().lower()[:200], data.get("password", "")
-    admin_portal = data.get("portal") == "admin"
     with connect() as db:
         user = db.execute("SELECT * FROM users WHERE email=? AND active=1", (email,)).fetchone()
-    if not user or len(password) > 128 or not password_matches(password, user["password"]) or (admin_portal and user["role"] != "admin"):
-        return render(request, "admin/login.html" if admin_portal else "customer/auth.html", 400, title="Đăng nhập", mode="login", errors={"general": "Email hoặc mật khẩu không đúng, hoặc tài khoản không được phép truy cập."}, values={"email": email})
+    if not user or len(password) > 128 or not password_matches(password, user["password"]):
+        return render(request, "customer/auth.html", 400, title="Đăng nhập", mode="login", errors={"general": "Email hoặc mật khẩu không đúng, hoặc tài khoản không được phép truy cập."}, values={"email": email})
     if not user["email_verified"] or user["otp_enabled"]:
         start_challenge(request, user["id"], "register" if not user["email_verified"] else "login")
         return redirect("/verify")
@@ -83,7 +81,7 @@ async def forgot(request: Request):
     with connect() as db:
         user = db.execute("SELECT * FROM users WHERE email=? AND active=1", (data.get("email", "").strip().lower()[:200],)).fetchone()
     start_challenge(request, user["id"] if user else None, "reset")
-    return redirect("/verify", request, "Nếu tài khoản tồn tại, bạn có thể dùng mã OTP demo để đặt lại mật khẩu.")
+    return redirect("/verify", request, 'Nếu tài khoản tồn tại, bạn có thể dùng mã OTP để đặt lại mật khẩu.')
 
 
 @router.get("/verify")
@@ -144,5 +142,7 @@ async def resend(request: Request):
 @router.post("/logout")
 async def logout(request: Request):
     await form_data(request)
+    user = user_of(request)
+    destination = '/admin/login' if user and user['role'] == 'admin' else '/'
     request.session.clear()
-    return redirect("/")
+    return redirect(destination)

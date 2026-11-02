@@ -200,8 +200,9 @@
 
 (() => {
   let pending, timer, generation = 0;
+  if(window.__neuPageController&&window.__neuNativeListener)window.__neuNativeListener.call(window.__neuPageController.signal,'abort',()=>{clearTimeout(timer);pending?.abort();generation++;},{once:true});
   const announce = document.createElement('p');
-  announce.className = 'sr-only'; announce.setAttribute('role', 'status');
+  announce.className = 'sr-only'; announce.dataset.neuLiveAnnouncement = 'true'; announce.setAttribute('role', 'status');
   document.body.append(announce);
   const enhance = () => document.querySelectorAll('[data-live-form] [data-live-submit]').forEach(button => { button.hidden = true; });
   enhance();

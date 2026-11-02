@@ -9,10 +9,60 @@ from datetime import date
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import Response
 
-from .core import TRANSITIONS, audit, cancel_order, event, finish_order, form_data, integer, move_stock, notify, order_for, redirect, refresh_product, refund, render, require_admin, upload
-from .db import IMAGES, connect, password_hash
+from .core import TRANSITIONS, audit, cancel_order, event, finish_order, form_data, integer, move_stock, notify, order_for, redirect, refresh_product, refund, render, require_admin, require_signed_contract, upload
+from .db import IMAGES, connect, password_hash, password_matches
 
 router = APIRouter(prefix="/admin")
+
+
+@router.get("/profile")
+def personal_profile(request: Request, edit: bool = False, security: bool = False):
+    user = require_admin(request)
+    return render(request, "admin/profile.html", title="Thông tin cá nhân", section="profile", values=dict(user), edit=edit, security=security)
+
+
+@router.post("/profile")
+async def save_personal_profile(request: Request):
+    user = require_admin(request)
+    data = await form_data(request)
+    values = {key: data.get(key, "").strip() for key in ("name", "phone", "birth_date", "gender")}
+    errors = {}
+    if not 2 <= len(values["name"]) <= 80:
+        errors["name"] = "Họ tên cần từ 2 đến 80 ký tự."
+    if values["phone"] and not re.fullmatch(r"(?:0|\+84)[0-9]{9}", values["phone"]):
+        errors["phone"] = "Số điện thoại không hợp lệ."
+    try:
+        if values["birth_date"] and date.fromisoformat(values["birth_date"]) > date.today():
+            errors["birth_date"] = "Ngày sinh không thể ở tương lai."
+    except ValueError:
+        errors["birth_date"] = "Ngày sinh không hợp lệ."
+    if values["gender"] not in ("", "Nam", "Nữ", "Khác"):
+        errors["gender"] = "Chọn giới tính hợp lệ."
+    if errors:
+        return render(request, "admin/profile.html", 400, title="Thông tin cá nhân", section="profile", values=values, errors=errors, edit=True)
+    with connect() as db:
+        db.execute("UPDATE users SET name=?,phone=?,birth_date=?,gender=? WHERE id=?", (*values.values(), user["id"]))
+        audit(db, user["id"], "Cập nhật hồ sơ cá nhân", "Quản trị viên cập nhật thông tin của mình.")
+    return redirect("/admin/profile", request, "Đã cập nhật thông tin cá nhân.")
+
+
+@router.post("/profile/password")
+async def change_personal_password(request: Request):
+    user = require_admin(request)
+    data = await form_data(request)
+    errors = {}
+    if not password_matches(data.get("current_password", "")[:128], user["password"]):
+        errors["current_password"] = "Mật khẩu hiện tại chưa đúng."
+    password = data.get("password", "")
+    if not 8 <= len(password) <= 128 or password != data.get("confirm"):
+        errors["password"] = "Mật khẩu mới cần 8–128 ký tự và nhập lại trùng khớp."
+    if errors:
+        return render(request, "admin/profile.html", 400, title="Thông tin cá nhân", section="profile", values=dict(user), errors=errors, security=True)
+    with connect() as db:
+        db.execute("UPDATE users SET password=?,auth_rev=auth_rev+1 WHERE id=?", (password_hash(password), user["id"]))
+        audit(db, user["id"], "Đổi mật khẩu cá nhân", "Đã thu hồi các phiên đăng nhập cũ.")
+    request.session["auth_rev"] = user["auth_rev"] + 1
+    return redirect("/admin/profile", request, "Đã đổi mật khẩu và thu hồi các phiên đăng nhập cũ.")
 
 
 @router.get("")
@@ -74,7 +124,7 @@ async def save_product(request: Request):
         if not low <= len(values[field]) <= high:
             errors[field] = f"Nhập từ {low} đến {high} ký tự."
     if values["image"] not in IMAGES:
-        errors["image"] = "Chọn minh họa hợp lệ."
+        errors["image"] = 'Chọn tham khảo hợp lệ.'
     brand_id = integer(data.get("brand_id"))
     with connect() as db:
         old = db.execute("SELECT * FROM products WHERE id=?", (product_id,)).fetchone() if product_id else None
@@ -355,6 +405,8 @@ async def order_status(request: Request, order_id: int):
         if status == "Đã hủy":
             cancel_order(db, order, actor["id"], note)
         else:
+            if status == 'Đang chuẩn bị':
+                require_signed_contract(db, order_id)
             if order["payment_method"] != "cod" and order["payment_status"] != "Đã thanh toán":
                 raise HTTPException(400, "Đơn thanh toán online phải thanh toán thành công trước khi xử lý.")
             tracking = data.get("tracking_code", "").strip()[:80] or order["tracking_code"]
@@ -399,7 +451,7 @@ async def return_update(request: Request, return_id: int):
             refund(db, order)
             db.execute("UPDATE orders SET status='Đã trả hàng',points_awarded=0 WHERE id=?", (order["id"],))
             db.execute("UPDATE users SET points=MAX(0,points-?) WHERE id=?", (order["points_awarded"], order["user_id"]))
-            event(db, order, "Đã trả hàng", "Đã hoàn tiền mô phỏng về phương thức gốc.")
+            event(db, order, "Đã trả hàng", 'Đã hoàn tiền thử nghiệm về phương thức gốc.')
         notify(db, row["user_id"], "Cập nhật yêu cầu trả hàng", status + (": " + response if response else ""), f"/orders/{row['order_id']}")
         audit(db, actor["id"], "Xử lý trả hàng", f"#{return_id}: {status}")
     return redirect("/admin/returns", request, "Đã cập nhật yêu cầu trả hàng.")
@@ -464,7 +516,7 @@ async def user_create(request: Request):
             raise HTTPException(400, "Email đã được sử dụng.")
         db.execute("INSERT INTO users(name,email,password,role) VALUES(?,?,?,?)", (name, email.lower(), password_hash(password), role))
         audit(db, actor["id"], "Tạo tài khoản", f"{email}: {role}")
-    return redirect("/admin/users", request, "Đã tạo tài khoản demo.")
+    return redirect("/admin/users", request, "Đã tạo tài khoản.")
 
 
 @router.post("/users/{user_id}")
@@ -533,8 +585,8 @@ async def reconcile(request: Request, payment_id: int):
         if not row:
             raise HTTPException(400, "Chỉ đối soát giao dịch thành công.")
         db.execute("UPDATE payments SET reconciled=1 WHERE id=?", (payment_id,))
-        audit(db, actor["id"], "Đối soát giao dịch demo", row["reference"])
-    return redirect("/admin/reports", request, "Đã ghi nhận đối soát nội bộ demo.")
+        audit(db, actor["id"], 'Đối soát giao dịch ', row["reference"])
+    return redirect("/admin/reports", request, "Đã ghi nhận đối soát nội bộ.")
 
 
 @router.get("/support")

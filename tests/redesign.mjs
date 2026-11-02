@@ -57,7 +57,7 @@ try {
   });
   console.log('Guest cart fixture ready');
   await admin.goto(base+'/admin/login',{waitUntil:'load'});await admin.type('#email','admin@neushop.local');await admin.type('#password','Admin@12345');
-  await Promise.all([admin.waitForNavigation({waitUntil:'load'}),admin.click('form button')]);
+  await Promise.all([admin.waitForNavigation({waitUntil:'load'}),admin.click('.auth-form form button')]);
   console.log('Admin authenticated');
   for(const width of [375,1440])for(const [page,name,path] of [[customer,'home','/'],[customer,'catalog','/products'],[customer,'product',`/products/${product}`],[customer,'cart','/cart'],[customer,'login','/login'],[admin,'dashboard','/admin'],[admin,'admin-products','/admin/products']]){
     await page.bringToFront();

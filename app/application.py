@@ -3,12 +3,13 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from starlette.middleware.sessions import SessionMiddleware
+from .tab_sessions import TabSessionMiddleware
 
 from . import account, admin, auth, store, portal, contracts
 from .portal import track_visit
-from .core import UPLOAD_DIR, expire_orders, redirect, render
+from .core import UPLOAD_DIR, expire_orders, redirect, render, user_of
 from .db import ROOT, connect, initialize, session_secret
 
 
@@ -28,16 +29,24 @@ app.mount("/media", StaticFiles(directory=UPLOAD_DIR), name="media")
 @app.middleware("http")
 async def browser_headers(request: Request, call_next):
     request.session.setdefault("csrf", secrets.token_urlsafe(32))
+    response = None
     if not request.url.path.startswith(("/static", "/media")):
         expire_orders()
-    response = await call_next(request)
+        user = user_of(request)
+        path = request.url.path
+        admin_path = path == '/admin' or path.startswith('/admin/')
+        admin_api = path in ('/api/health', '/api/support') or path.startswith('/api/orders/')
+        if user and user['role'] == 'admin' and not (admin_path or admin_api or (path == '/logout' and request.method == 'POST')):
+            response = redirect('/admin') if request.method in ('GET', 'HEAD') and not path.startswith('/api/') else JSONResponse({'detail': 'Tài khoản quản trị chỉ thao tác trong khu vực admin.'}, status_code=403)
+    if response is None:
+        response = await call_next(request)
     if response.status_code==200:
         track_visit(request)
     response.headers.update({"X-Content-Type-Options": "nosniff", "X-Frame-Options": "DENY", "Referrer-Policy": "same-origin", "Content-Security-Policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; frame-src https://www.google.com; form-action 'self'; frame-ancestors 'none'; base-uri 'self'", "Cache-Control": "no-store"})
     return response
 
 
-app.add_middleware(SessionMiddleware, secret_key=session_secret(), same_site="lax", max_age=86400, https_only=False)
+app.add_middleware(TabSessionMiddleware, secret_key=session_secret(), same_site="lax", max_age=86400, https_only=False)
 
 
 @app.exception_handler(StarletteHTTPException)

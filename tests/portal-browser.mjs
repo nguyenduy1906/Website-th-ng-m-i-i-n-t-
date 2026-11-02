@@ -40,13 +40,15 @@ try{
   assert(image);await(await admin.$('#new-image')).uploadFile(join(root,'app/static/images/catalog',image));
   await submit(admin,'form[action="/admin/content"]');
   await go(guest,'/news');await guest.type('#news-q','Cẩm nang thiết bị');await guest.waitForFunction(()=>location.search.includes('q=')&&document.querySelectorAll('.news-card').length===1);record('live topic/news search');
-  const articlePath=await guest.$eval('.news-card h2 a',a=>new URL(a.href).pathname);await go(guest,articlePath);assert(await guest.$('.page-cover'));assert(await guest.$('.rich-content strong'));assert(await guest.$('.share-tools a[href*="facebook.com"]'));record('article image formatting and share');
+  const articlePath=await guest.$eval('.news-card h2 a',a=>new URL(a.href).pathname);await go(guest,articlePath);assert(await guest.$('.page-cover'));assert(await guest.$('.rich-content strong'));assert.equal((await guest.$$('.share-tools,[data-share-url],[data-copy-url]')).length,0);record('article image formatting without share controls');
   await go(customer,'/login');await post(customer,'/login',{email:'demo.lan@example.test',password:'Demo@12345'});
   await go(customer,`/products/${fixture.product}`);await post(customer,'/cart/add',{variant_id:fixture.variant,quantity:1});await go(customer,'/checkout');
   const key=await customer.$eval('[name=checkout_key]',element=>element.value);
   await post(customer,'/checkout',{checkout_key:key,recipient:'Khách demo',phone:'0912345678',address:'12 Đường Kiểm Thử, Hà Nội',shipping_method:'standard',payment_method:'cod',action:'place'});
-  const orderId=new URL(customer.url()).pathname.match(/\/orders\/(\d+)/)[1];
-  await post(customer,`/orders/${orderId}/contract`,{});const contractPath=new URL(customer.url()).pathname;
+  const contractPath=new URL(customer.url()).pathname;assert(contractPath.startsWith('/contracts/'));
+  const orderId=await customer.$eval('.contract-layout a[href*="/orders/"]',element=>element.getAttribute('href').split('/').pop());
+  await go(admin,`/admin/orders/${orderId}`);assert(await admin.$('form[action$="/status"] button[disabled]'));
+  await customer.setViewport({width:375,height:1000});await customer.screenshot({path:join(output,'contract-before-confirmation-375.png'),fullPage:true});record('checkout opens contract before admin approval');
   await post(customer,contractPath+'/otp',{});const code=await customer.$eval('#contract-demo-otp',element=>element.textContent.trim());
   await customer.type('#contract-code',code);await customer.click('[name=consent]');await submit(customer,`form[action="${contractPath}/sign"]`);
   assert((await customer.content()).includes('Đã xác nhận OTP'));assert.equal(await customer.$('#contract-demo-otp'),null);record('contract read consent OTP confirmation');

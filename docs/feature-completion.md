@@ -9,11 +9,11 @@
 | Tiện ích | `/admin/settings`: hotline, email, địa chỉ, giờ hỗ trợ, mạng xã hội, truy vấn bản đồ. Chỉ hiển thị thông tin đã cấu hình. Bản đồ Google tải khi người dùng bấm xem và cần Internet. |
 | Thống kê | `/admin/analytics`: lượt xem, phiên khách, online trong 3 phút và lịch sử 30 ngày. Footer có thể bật/tắt thống kê. Dữ liệu đo trên local, phiên trình duyệt không đồng nghĩa số người thật. |
 | Lưu trữ | Sản phẩm có thể lưu trữ/khôi phục tại `/admin/archive`, giữ nguyên lịch sử đơn. |
-| Hợp đồng | Từ chi tiết đơn chọn lập hợp đồng; danh sách tại `/account/contracts`, quản trị tại `/admin/contracts`. |
+| Hợp đồng | Tự lập và mở ngay sau checkout, xác nhận trước thanh toán/duyệt đơn; danh sách tại `/account/contracts`, quản trị tại `/admin/contracts`. |
 
 ## Hợp đồng điện tử demo
 
-Khách lập hợp đồng từ đơn của mình, đọc bản nội dung đóng băng, nhập đúng họ tên, đồng ý điều khoản và xác nhận OTP. OTP hiển thị trong phiên demo, hết hạn sau 5 phút, giới hạn 5 lần thử và giãn cách cấp mã. Admin xem và hủy hiệu lực có lý do; không xác nhận thay khách. Hủy đơn hoặc hoàn tiền làm hợp đồng mất hiệu lực, vẫn giữ bản nội dung và lịch sử.
+Hợp đồng được lập tự động cùng transaction tạo đơn. Khách bấm “Tiếp tục xem hợp đồng” tại checkout, đọc bản nội dung đóng băng, nhập đúng họ tên, đồng ý điều khoản và xác nhận OTP. Sau đó khách tiếp tục thanh toán online hoặc theo dõi đơn COD chờ admin duyệt. OTP hiển thị trong phiên demo, hết hạn sau 5 phút, giới hạn 5 lần thử và giãn cách cấp mã. Thời hạn giữ hàng online 15 phút từ lúc tạo đơn bao gồm bước xác nhận hợp đồng. Máy chủ chặn thanh toán/thử lại/chuyển COD và duyệt sang chuẩn bị hàng khi hợp đồng chưa xác nhận hoặc không toàn vẹn. Đơn cũ chưa có hợp đồng có thể lập từ chi tiết đơn. Admin xem và hủy hiệu lực có lý do; không xác nhận thay khách. Hủy đơn hoặc hoàn tiền làm hợp đồng mất hiệu lực, vẫn giữ bản nội dung và lịch sử.
 
 Nội dung người mua, người bán, sản phẩm và số tiền được chụp tại lúc lập; thay đổi sản phẩm sau đó không sửa bản hợp đồng. SHA-256 phục vụ đối chiếu nội dung, không phải chữ ký số được chứng thực. Chủ sở hữu và admin có thể tải HTML hoặc mở bản in rồi dùng Save as PDF của trình duyệt. Không gửi OTP qua SMS/email thật và không tích hợp nhà cung cấp ký số. Đây là hợp đồng mua hàng demo; không phải module tài chính trả góp trong ERD gốc.
 

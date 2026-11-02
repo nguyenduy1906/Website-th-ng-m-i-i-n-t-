@@ -53,9 +53,10 @@ Khai báo biến ngữ nghĩa trong theme/stylesheet chung; component dùng toke
 | warning | #92400E | Cảnh báo |
 | danger | #B91C1C | Lỗi, hành động xóa |
 | focus | #0369A1 | Vòng focus 2px, offset 2px |
-| navy | #0F172A | Header khách hàng, rail quản trị |
-| on-navy | #FFFFFF | Nội dung chính trên nền navy |
-| navy-muted | #CBD5E1 | Nội dung phụ trên nền navy |
+| shell (navy tương thích) | #E0F2FE | Nền xanh nước nhạt của header, footer, rail quản trị và vùng tài khoản |
+| on-shell (on-navy tương thích) | #0F172A | Chữ chính trên nền xanh nước nhạt |
+| shell-muted (navy-muted tương thích) | #475569 | Chữ phụ trên nền xanh nước nhạt |
+| shell-border | #BAE6FD | Đường phân cách vùng nền xanh nước nhạt |
 | surface-raised | #FFFFFF | Bề mặt nổi, panel và vùng mua |
 
 Mặc định giao diện sáng. Không dùng brand sáng làm nền chữ trắng cỡ nhỏ. Kiểm tra tương phản thực tế: chữ thường 4.5:1, chữ lớn và điều khiển 3:1. Trạng thái phải kèm nhãn hoặc biểu tượng, không chỉ có màu.
@@ -119,12 +120,15 @@ Header → danh mục/banner → danh mục nổi bật → nhóm sản phẩm �
 
 - Giỏ: ảnh, tên, biến thể, đơn giá, số lượng, xóa, tổng tiền. Tóm tắt đơn bên phải desktop và phía dưới mobile.
 - Thanh toán: người nhận, địa chỉ, giao hàng/thanh toán theo chức năng thực tế, tóm tắt đơn và nút đặt hàng. Giảm nội dung quảng cáo trong luồng này.
+- Nút cuối form là “Tiếp tục xem hợp đồng”: lưu đơn và mở ngay hợp đồng được lập tự động. Hiển thị các bước thông tin → hợp đồng → thanh toán/chờ duyệt COD → xử lý/giao hàng. Khách đọc, đồng ý và xác nhận OTP trước khi mở thanh toán online hoặc admin duyệt COD; sau xác nhận có nút tiếp tục rõ ràng. Chi tiết đơn đặt trạng thái hợp đồng ở đầu trang. Thời hạn giữ hàng online 15 phút bao gồm bước xác nhận hợp đồng và phải được ghi rõ.
 - Tách tiền hàng, vận chuyển, giảm giá, tổng cuối; khoản chưa biết ghi rõ. Giữ dữ liệu nhập khi có lỗi, ngăn gửi đơn trùng lúc xử lý.
 - Hoàn tất chỉ hiện sau thành công thực tế, dùng mã đơn và bước tiếp theo từ dữ liệu thật.
 
 ## Tài khoản và quản trị khi có yêu cầu
 
 Tài khoản dùng menu và vùng nội dung, lịch sử đơn theo cùng token. Quản trị dùng sidebar, tiêu đề, bộ lọc, bảng và form; mật độ cao hơn trang mua hàng, không dùng hero quảng cáo. Bảng mobile cuộn trong vùng riêng hoặc chuyển nhãn–giá trị.
+
+Phiên admin chỉ sử dụng giao diện quản trị. Không có liên kết về cửa hàng hoặc hồ sơ khách hàng trong shell admin; URL mua sắm mở trong phiên admin đưa về `/admin`, thao tác ghi phía khách hàng bị chặn. Đăng xuất admin về `/admin/login`. Xem/in/tải hợp đồng của admin dùng đường dẫn `/admin/contracts/...` và giữ điều hướng trong khu quản trị.
 
 ## Thành phần chung
 
@@ -183,3 +187,56 @@ Chatbot khách hàng mở bằng nút Tư vấn NEU SHOP ở góc dưới, dialo
 Theo yêu cầu riêng của người dùng, nút chatbot dùng logo shop hình tròn (ngoại lệ `border-radius: 50%`), kéo thả bằng chuột/cảm ứng trong giới hạn màn hình, hỗ trợ phím mũi tên. Chỉ shell khách hàng hiển thị chatbot; admin không có nút này.
 
 Chatbot đã bổ sung provider Ollama local mặc định và Gemini cấu hình sau bằng `.env`. Chi tiết thiết lập, dữ liệu gửi và giới hạn tại `docs/chatbot-ai.md`. Khi provider không sẵn sàng, UI ghi rõ đang tra cứu local. Khả năng hiểu ngôn ngữ tự nhiên yêu cầu runtime/model hoặc API key thực tế.
+
+Khung hội thoại neo theo vị trí logo: ưu tiên cạnh bên, đổi sang trên/dưới khi thiếu chỗ và giới hạn trong viewport. Kéo logo khi khung đang mở cập nhật khung ngay; resize/viewport bàn phím cũng tính lại vị trí. Trạng thái AI hiển thị ở footer, không chèn lỗi kỹ thuật trước mọi câu trả lời tra cứu.
+
+Chatbot không có câu hỏi gợi ý sẵn hoặc dòng chú thích dưới ô nhập. Header chỉ có nút đóng; hành động “Xóa dữ liệu” ở footer xóa lịch sử hội thoại trong phiên, hủy yêu cầu/hiệu ứng đang chạy và trả màn hình chào. Không xóa dữ liệu sản phẩm của cửa hàng.
+
+Câu trả lời sản phẩm có thẻ ảnh local, tên, giá/phiên bản, tồn kho, thông số và liên kết Xem chi tiết tới đúng variant. Xóa dữ liệu dùng chữ nhỏ căn phải ở cuối khung, giữ vùng bấm tối thiểu 44px.
+
+Kết quả tìm sản phẩm trong chat mở đầu bằng một câu đếm đúng tổng số sản phẩm phù hợp. Nếu chỉ hiển thị một phần, ghi rõ số thẻ đang hiển thị. Không lặp tên, giá, tồn kho hoặc thông số của các thẻ thành đoạn văn phía trên.
+
+Header/nav khách hàng và topbar admin bám đầu viewport khi cuộn. Chiều cao header được theo dõi để chừa khoảng cuộn tới anchor và tránh che tóm tắt đơn. Gỡ toàn bộ cụm chia sẻ/sao chép liên kết ở sản phẩm, bài viết và phiếu liên hệ; không hiển thị nút chia sẻ Facebook.
+
+## Thương hiệu và bài viết
+
+Dải thương hiệu dùng logo SVG thật từ nguồn Simple Icons, giữ nguyên tỷ lệ qua object-fit contain; hiển thị các thương hiệu có file logo đã tải, liên kết lọc thương hiệu như cũ. Logo bên thứ ba chỉ dùng để nhận diện thương hiệu sản phẩm; ngoại lệ này được người dùng yêu cầu, không áp dụng cho logo/nhận diện của NEU SHOP. Trang chủ hiển thị 6 bài mới; trang đọc có cột bài chính, mục lục anchor và 6 bài đọc tiếp, xuống một cột trên mobile. Nội dung biên soạn có nguồn rõ ràng, không nhập giá/ưu đãi nguồn thành chính sách cửa hàng.
+
+## Phiên riêng theo tab và logo đầy đủ
+
+Theo yêu cầu người dùng: trình duyệt lưu phiên ký trong sessionStorage riêng từng tab, truyền bằng header nội bộ; không dùng cookie đăng nhập chung giữa tab. Trang riêng tư mở qua bước khởi tạo phiên và yêu cầu JavaScript. Mở tab mới cần đăng nhập lại; tải lại/điều hướng trong tab hiện tại giữ phiên. Trang công khai vẫn xem được khi tắt JavaScript. Logo thương hiệu thay bằng 24 ảnh wordmark PNG từ nguồn CellphoneS và hai SVG đã căn khung; nguồn từng ảnh nằm trong docs/brand-logos.json.
+
+Điều hướng liên kết nội bộ trong cùng tab giữ giao diện đang hiển thị trong lúc lấy trang mới, không ẩn toàn bộ root hoặc khởi tạo lại phiên tab. URL và lịch sử Back được cập nhật; Ctrl/Cmd-click và target blank vẫn mở tab riêng cần đăng nhập. Các timer trang cũ được hủy trước khi chuyển để tránh cập nhật nhầm nội dung.
+
+Điều hướng cùng shell chỉ thay `main[data-live-results]`, giữ nguyên DOM header, sidebar admin, menu tài khoản và chatbot. Chỉ cập nhật mục đang chọn, tiêu đề và vùng nội dung; vị trí cuộn sidebar giữ nguyên. Listener/timer của trang cũ được dọn trước khi khởi tạo tương tác trang mới. Chỉ dựng lại toàn document khi đổi loại shell hoặc chuyển trạng thái đăng nhập.
+
+## Rà soát giao diện chi tiết ngày 02/11/2026
+
+Trang chi tiết sản phẩm nhấn phần giá và phiên bản; đơn hàng chia rõ sản phẩm, thanh toán và lịch sử. Hợp đồng dùng phần thông tin hai bên cân đối, tổng tiền có nền phân biệt, cột trạng thái bên phải trên màn hình rộng và một cột trên điện thoại. Mã đối chiếu dài nằm trong phần mở rộng. Nội dung hợp đồng đã xác nhận được giữ nguyên trong mục Điều khoản đã xác nhận; không sửa ảnh chụp dữ liệu hoặc mã băm để thay câu chữ.
+
+Nhãn giao diện và nội dung có thể chỉnh sửa dùng cách viết rõ ràng, bỏ từ demo/minh họa không cần thiết. Các dịch vụ chưa kết nối vẫn được mô tả chính xác tại nơi thực hiện, không đổi tên để tạo cảm giác đã tích hợp ngân hàng hay vận chuyển. Email tài khoản, mã kỹ thuật, dữ liệu giao dịch và lịch sử xác nhận không thay đổi chỉ nhằm làm đẹp câu chữ.
+
+Đã rà 40 trang công khai, tài khoản và quản trị ở 375/768/1280px: 120 lượt không ghi nhận lỗi JavaScript hoặc tràn ngang toàn trang. Đây là kiểm tra bố cục và tải trang, không thay thế kiểm thử từng thao tác nghiệp vụ.
+
+## Hồ sơ quản trị ngày 03/11/2026
+
+Avatar quản trị dẫn trực tiếp đến /admin/profile. Trang chỉ hiển thị thông tin cá nhân và hai thao tác chỉnh sửa thông tin, đổi mật khẩu; dùng card rộng tối đa 800px và một cột trên điện thoại. Nút Đăng xuất thay ô trạng thái NEU SHOP ở cuối sidebar, dùng POST và CSRF hiện có. Không có menu mua sắm hay thông tin tài khoản khách hàng trong trang này.
+
+
+## Bố cục quản trị thống nhất ngày 03/11/2026
+
+Bảng và ô nhập dùng cỡ chữ 14px, nhãn form 13px; tiêu đề trang phân cách với nội dung bằng đường viền mảnh. Thanh lọc dùng khoảng cách 16px, bảng đặt trong khung cuộn riêng. Trang danh mục chia cột theo nội dung, nhóm thao tác phụ tách khỏi dòng chỉnh sửa. Form viết bài mới mặc định thu gọn để ưu tiên danh sách. Mục mở rộng có ký hiệu cộng/trừ. Đăng xuất luôn có thể truy cập ở cuối thanh bên, kể cả sidebar thu gọn và mobile. Giữ màu navy, primary và góc bo 5px. Đã kiểm tra 22 trang/trạng thái ở 320/768/1280px: 66 lượt không tràn ngang, bộ lọc và cặp ô nhập thẳng hàng, không lỗi JavaScript.
+
+
+## Đăng nhập chung
+
+/login và /admin/login dùng cùng giao diện đăng nhập. Vai trò lưu trong tài khoản quyết định chuyển đến /admin hoặc khu tài khoản/checkout sau xác thực; không dựa vào trường portal do trình duyệt gửi. Trang xác thực dùng ảnh thật giếng trời/cầu thang trung tâm A2 NEU, giữ tỷ lệ. Theo yêu cầu chỉnh ngày 03/11/2026, bỏ chú thích dưới ảnh, nguồn lưu tại THIRD_PARTY_NOTICES.md; vùng ảnh dùng token cục bộ --auth-surface #F3EEE6 (kem ấm), chữ tối theo token chung, padding 40px 32px và góc bo 5px.
+
+
+
+## Cập nhật nền xanh nước nhạt và chuyển form xác thực
+
+Theo yêu cầu ngày 03/11/2026, các vùng nền navy cũ trên khách hàng và quản trị chuyển sang shell #E0F2FE, chữ tối #0F172A và chữ phụ #475569. Quyết định này thay thế các mô tả navy cũ bên trên, kể cả nền kem quanh ảnh xác thực. Giữ màu nút primary và chữ trắng trên primary; không đổi màu logo hoặc ảnh. Desktop: form đăng nhập bên trái, ảnh bên phải; đăng ký ngược lại. Khi đổi giữa hai form, hai vùng trượt sang vị trí mới trong 420ms, tắt chuyển động khi reduced-motion. Mobile dùng một cột.
+
+Chuyển login/register giữ nguyên DOM khung xác thực và ảnh, chỉ thay form; không chạy lại script trang hoặc cuộn về đầu. Giữ email đã nhập, không sao chép mật khẩu. Desktop dùng chiều cao khung tối thiểu 620px, padding dọc 28px và khoảng cách field 14px để không nhảy bố cục giữa hai form. Kiểm tra bằng npm run check:auth-transition tại 375/768/1280px.
+

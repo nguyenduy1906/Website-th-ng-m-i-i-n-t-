@@ -129,14 +129,14 @@ try {
     await page.setViewport({ width: 1440, height: 950 }); await go('/products/1');
     const options = await page.$$eval('#variant option', nodes => nodes.map(node => node.value));
     assert(options.length >= 2, 'need seeded multivariant product');
-    await Promise.all([page.waitForNavigation({ waitUntil: 'load' }), page.select('#variant', options[1])]);
+    await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.select('#variant', options[1])]);
     assert.equal(new URL(page.url()).searchParams.get('variant'), options[1]);
   });
   await check('checkout shipping and voucher preview without order', async () => {
     await go('/login'); await fill('#email', 'demo.lan@example.test'); await fill('#password', 'Demo@12345');
-    await Promise.all([page.waitForNavigation({ waitUntil: 'load' }), page.click('form[action="/login"] button')]);
+    await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('form[action="/login"] button')]);
     await go('/cart');
-    await Promise.all([page.waitForNavigation({ waitUntil: 'load' }), page.click('#cart-selection button')]);
+    await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('#cart-selection button')]);
     assert.equal(new URL(page.url()).pathname, '/checkout');
     const oldTotal = await page.$eval('.summary-total dd', node => node.textContent);
     await page.select('#shipping_method', 'express');
@@ -149,9 +149,10 @@ try {
   const adminContext = await browser.createBrowserContext(), admin = await adminContext.newPage();
   admin.on('pageerror', error => pageErrors.push(error.message)); await admin.setViewport({ width: 1440, height: 950 });
   await check('admin global search updates without submit', async () => {
-    await admin.goto(base + '/admin/login', { waitUntil: 'load' });
+    await admin.goto(base + '/admin/login', { waitUntil: 'networkidle0' });
     await admin.type('#email', 'admin@neushop.local'); await admin.type('#password', 'Admin@12345');
-    await Promise.all([admin.waitForNavigation({ waitUntil: 'load' }), admin.click('form button')]);
+    await Promise.all([admin.waitForNavigation({ waitUntil: 'networkidle0' }), admin.click('.auth-form form button')]);
+    await admin.waitForSelector('#admin-global-search');
     await admin.type('#admin-global-search', 'Logitech');
     await admin.waitForFunction(() => location.pathname === '/admin/products' && new URL(location.href).searchParams.get('q') === 'Logitech' && !document.querySelector('[aria-busy="true"]'));
     const names = await admin.$$eval('.table-product strong', nodes => nodes.map(node => node.textContent));
@@ -164,7 +165,7 @@ try {
   });
   await check('every admin search updates and clears without submit', async () => {
     for (const [route, selector] of [['/admin/products', '#admin-q'], ['/admin/orders', '#orders-q'], ['/admin/users', '#users-q'], ['/admin/contact', '#contact-q']]) {
-      await admin.goto(base + route, { waitUntil: 'load' });
+      await admin.goto(base + route, { waitUntil: 'networkidle0' });
       for (const value of ['z', 'zz-no-match', '']) {
         await admin.$eval(selector, (input, value) => { input.focus(); input.value = value; input.setSelectionRange(value.length, value.length); input.dispatchEvent(new Event('input', { bubbles: true })); }, value);
         await admin.waitForFunction(value => new URL(location.href).searchParams.get('q') === value && !document.querySelector('[aria-busy="true"]'), {}, value);
@@ -174,7 +175,7 @@ try {
     }
   });
   await check('no JavaScript still has submit fallback', async () => {
-    const fallback = await browser.newPage(); await fallback.setJavaScriptEnabled(false); await fallback.goto(base + '/products', { waitUntil: 'load' });
+    const fallback = await browser.newPage(); await fallback.setJavaScriptEnabled(false); await fallback.goto(base + '/products', { waitUntil: 'networkidle0' });
     assert.equal(await fallback.$eval('.filter-panel [data-live-submit]', button => button.hidden), false);
     await fallback.close();
   });

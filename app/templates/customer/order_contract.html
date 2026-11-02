@@ -1,1 +1,14 @@
-<section class="surface content-section"><h2>Hợp đồng điện tử demo</h2>{% if contract %}<p>Bản nội dung <strong>{{ contract.number }}</strong> và lịch sử xác nhận đã được lưu theo đơn này.</p><a class="button secondary" href="{{ '/admin' if user.role=='admin' and user.id!=order.user_id else '' }}/contracts/{{ contract.id }}">Xem hợp đồng</a>{% elif user.id==order.user_id and order.status not in ['Đã hủy','Đã trả hàng'] and order.payment_status!='Đã hoàn tiền' %}<p>Lập bản nội dung mua hàng từ thông tin đơn, đọc và xác nhận bằng OTP mô phỏng. Không phát sinh giao dịch thực tế.</p><form action="/orders/{{ order.id }}/contract" method="post">{{ csrf_field(csrf) }}<button class="button secondary">Lập & xem hợp đồng</button></form>{% else %}<p class="muted">Chưa có hợp đồng được lập cho đơn này.</p>{% endif %}</section>
+<section class="surface content-section"><h2>Hợp đồng điện tử </h2>
+{% if contract %}
+  {% if contract.status == 'draft' %}
+    <p class="notice">{% if admin_view %}Khách hàng chưa xác nhận hợp đồng. Chưa thể duyệt đơn để chuẩn bị hàng.{% else %}Bạn cần đọc và xác nhận hợp đồng bằng OTP trước khi thanh toán hoặc chờ admin duyệt đơn COD.{% endif %}</p>
+  {% elif contract.status == 'signed' %}
+    <p class="badge success">Khách hàng đã xác nhận hợp đồng bằng OTP</p>
+  {% else %}<p class="warning-note">Hợp đồng đã bị hủy hiệu lực.</p>{% endif %}
+  <p>Bản nội dung <strong>{{ contract.number }}</strong> và lịch sử xác nhận được lưu theo đơn này.</p>
+  <a class="button {{ 'secondary' if admin_view or contract.status != 'draft' }}" href="{{ '/admin' if admin_view else '' }}/contracts/{{ contract.id }}">{{ 'Đọc & xác nhận hợp đồng' if not admin_view and contract.status == 'draft' else 'Xem hợp đồng' }}</a>
+{% elif user.id == order.user_id and order.status not in ['Đã hủy','Đã trả hàng'] and order.payment_status != 'Đã hoàn tiền' %}
+  <p>Đọc và xác nhận hợp đồng trước khi thanh toán hoặc chờ duyệt đơn COD.</p>
+  <form action="/orders/{{ order.id }}/contract" method="post">{{ csrf_field(csrf) }}<button class="button">Lập & xem hợp đồng</button></form>
+{% else %}<p class="muted">Chưa có hợp đồng được lập cho đơn này.</p>{% endif %}
+</section>

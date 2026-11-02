@@ -1,0 +1,23 @@
+{% extends 'admin/base.html' %}
+{% from 'customer/macros.html' import field,csrf_field,icon %}
+{% block content %}
+<section class="surface admin-profile">
+<div class="admin-profile-heading"><span class="admin-avatar">{{ icon('user',28) }}</span><div><h2>{{ user.name }}</h2><p class="muted">Quản trị viên</p></div></div>
+{% if edit %}
+<form action="/admin/profile" method="post">{{ csrf_field(csrf) }}
+{{ field('name','Họ và tên',values,errors,autocomplete='name',maxlength=80) }}
+<div class="form-two-col">{{ field('phone','Số điện thoại',values,errors,type='tel',required=false,autocomplete='tel',maxlength=12) }}{{ field('birth_date','Ngày sinh',values,errors,type='date',required=false) }}</div>
+<div class="field"><label for="gender">Giới tính</label><select id="gender" name="gender">{% for gender in ['','Nam','Nữ','Khác'] %}<option value="{{ gender }}" {% if values.get('gender')==gender %}selected{% endif %}>{{ gender or 'Không cung cấp' }}</option>{% endfor %}</select>{% if errors.gender %}<small class="field-error">{{ errors.gender }}</small>{% endif %}</div>
+<div class="inline-actions"><button class="button">Lưu thay đổi</button><a class="button secondary" href="/admin/profile">Hủy</a></div></form>
+{% elif security %}
+<h3>Đổi mật khẩu</h3><form action="/admin/profile/password" method="post">{{ csrf_field(csrf) }}
+{{ field('current_password','Mật khẩu hiện tại',{},errors,type='password',autocomplete='current-password',maxlength=128) }}
+{{ field('password','Mật khẩu mới',{},errors,type='password',autocomplete='new-password',maxlength=128,hint='Từ 8 đến 128 ký tự.') }}
+{{ field('confirm','Nhập lại mật khẩu mới',{},errors,type='password',autocomplete='new-password',maxlength=128) }}
+<div class="inline-actions"><button class="button">Lưu mật khẩu</button><a class="button secondary" href="/admin/profile">Hủy</a></div></form>
+{% else %}
+<dl class="admin-profile-info">{% for label,value in [('Họ và tên',user.name),('Email',user.email),('Số điện thoại',user.phone),('Ngày sinh',user.birth_date),('Giới tính',user.gender),('Vai trò','Quản trị viên')] %}<div><dt>{{ label }}</dt><dd>{{ value or 'Chưa cập nhật' }}</dd></div>{% endfor %}</dl>
+<div class="inline-actions"><a class="button" href="/admin/profile?edit=true">Chỉnh sửa thông tin</a><a class="button secondary" href="/admin/profile?security=true">Đổi mật khẩu</a></div>
+{% endif %}
+</section>
+{% endblock %}

@@ -10,16 +10,20 @@ const errors = [];
 page.on('pageerror',error=>errors.push(error.message));
 try {
   await page.goto('http://127.0.0.1:8000/admin/login',{waitUntil:'networkidle0'});
+  await page.waitForSelector('input[name=email]');
   await page.type('input[name=email]','admin@neushop.local');
   await page.type('input[name=password]','Admin@12345');
-  await Promise.all([page.waitForNavigation({waitUntil:'networkidle0'}),page.click('form button')]);
-  const cases = ['','/products','/products/new','/orders','/reports','/catalog','/users','/vouchers','/inventory'];
+  await page.click('.auth-form form button');
+  await page.waitForSelector('.admin-main');
+  const cases = ['','/products','/products/new','/products/1/edit','/orders','/reports','/catalog','/users','/vouchers','/inventory','/returns','/contracts','/support','/contact','/content','/settings','/analytics','/logs','/archive','/profile','/profile?edit=true','/profile?security=true'];
   const measurements = [];
   for (const width of [320,768,1280]) {
     await page.setViewport({width,height:900});
     for (const route of cases) {
       const response = await page.goto('http://127.0.0.1:8000/admin'+route,{waitUntil:'networkidle0'});
       assert.equal(response.status(),200,route);
+      await page.waitForSelector('.admin-main');
+      await page.waitForFunction(()=>document.documentElement.dataset.tabReady==='true');
       const measurement = await page.evaluate(()=>({
         width:innerWidth,scroll:document.documentElement.scrollWidth,
         filters:[...document.querySelectorAll('.admin-search input:not([type=hidden]),.admin-search select,.admin-search button')].filter(el=>el.getClientRects().length&&el.getBoundingClientRect().height>0).map(el=>({tag:el.tagName,y:el.getBoundingClientRect().y,bottom:el.getBoundingClientRect().bottom,height:el.getBoundingClientRect().height})),
@@ -32,7 +36,7 @@ try {
       }
       for (const pair of measurement.fieldPairs) if(width>=640) assert(Math.abs(pair[0].y-pair[1].y)<2,`Paired controls not aligned ${route}/${width}: ${JSON.stringify(pair)}`);
       const filename=(route.replaceAll('/','-')||'dashboard')+'-'+width+'.png';
-      if (['','/reports','/products','/products/new','/vouchers'].includes(route)) await page.screenshot({path:output+'/'+filename,fullPage:route!='/products'});
+      if (['','/reports','/products','/products/new','/vouchers','/catalog','/content','/settings','/profile'].includes(route)) await page.screenshot({path:output+'/'+filename,fullPage:false});
     }
   }
   assert.deepEqual(errors,[]);

@@ -9,6 +9,7 @@
 {% elif name == 'audio' %}<path d="M4 14v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="12" width="4" height="8" rx="2"/><rect x="17" y="12" width="4" height="8" rx="2"/>
 {% elif name == 'accessory' %}<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h1m3 0h1m3 0h1m3 0h1M6 14h1m3 0h7"/>
 {% elif name == 'arrow' %}<path d="M4 12h16m-6-6 6 6-6 6"/>
+{% elif name == 'logout' %}<path d="M9 4H4v16h5M10 12h11m-4-4 4 4-4 4"/>
 {% elif name == 'bag' %}<path d="M5 7h14l1 14H4ZM9 8V6a3 3 0 0 1 6 0v2"/>
 {% elif name == 'grid' %}<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
 {% elif name == 'check' %}<path d="m5 12 4 4L19 6"/>
@@ -39,7 +40,7 @@
   <div class="product-copy"><span class="caption product-category">{{ categories[product.category] }} <span>{{ product.brand_name }}</span></span>
     <h3><a href="/products/{{ product.id }}">{{ product.name }}</a></h3>
     <div class="product-summary card-features">{% for specification in product.specs.splitlines()[:2] %}<span title="{{ specification }}">{{ specification.split(':',1)[-1]|trim }}</span>{% endfor %}</div>
-    <p class="review-caption">{% if product.review_count %}{{ product.rating }}/5 ({{ product.review_count }} {{ "đánh giá mẫu" if product.demo_review_count==product.review_count else "đánh giá" }}){% else %}Chưa có đánh giá{% endif %}</p>
+    <p class="review-caption">{% if product.review_count %}{{ product.rating }}/5 ({{ product.review_count }} {{ "đánh giá tham khảo" if product.demo_review_count==product.review_count else "đánh giá" }}){% else %}Chưa có đánh giá{% endif %}</p>
     {% if product.list_price and product.list_price>product.price %}<del class="list-price">{{ product.list_price|money }}</del>{% else %}<span class="list-price" aria-hidden="true">&nbsp;</span>{% endif %}<p class="price" data-vnd="{{ product.price }}">{{ product.price | money }}</p>
     <div class="card-bottom"><span class="stock {{ 'out' if not product.stock }}">{{ 'Còn hàng' if product.stock else 'Hết hàng' }}</span>
       <form action="/cart/add" method="post" data-quick-cart>{{ csrf_field(csrf) }}<input type="hidden" name="variant_id" value="{{ product.default_variant }}"><input type="hidden" name="quantity" value="1"><button class="icon-button card-cart" aria-label="Thêm {{ product.name }} vào giỏ" {% if not product.stock %}disabled{% endif %}>{{ icon('cart', 18) }}<span>Thêm</span></button></form>
@@ -64,5 +65,5 @@
 {% endmacro %}
 
 {% macro voucher_card(v) %}
-<article class="voucher-card"><span class="voucher-symbol">%</span><div><h3>{{ v.code }}</h3><p>Giảm {{ (v.value ~ '%') if v.kind == 'percent' else v.value | money }} cho đơn từ {{ v.min_total | money }}</p>{% if v.max_discount and v.kind == 'percent' %}<p class="caption">Tối đa {{ v.max_discount | money }}</p>{% endif %}<span class="caption">Hiệu lực {{ v.start_date }} – {{ v.end_date }} · Còn {{ v.usage_limit - v.used_count }} lượt demo</span></div></article>
+<article class="voucher-card"><span class="voucher-symbol">%</span><div><h3>{{ v.code }}</h3><p>Giảm {{ (v.value ~ '%') if v.kind == 'percent' else v.value | money }} cho đơn từ {{ v.min_total | money }}</p>{% if v.max_discount and v.kind == 'percent' %}<p class="caption">Tối đa {{ v.max_discount | money }}</p>{% endif %}<span class="caption">Hiệu lực {{ v.start_date }} – {{ v.end_date }} · Còn {{ v.usage_limit - v.used_count }} lượt </span></div></article>
 {% endmacro %}

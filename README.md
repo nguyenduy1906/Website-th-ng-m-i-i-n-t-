@@ -77,7 +77,7 @@ Admin có shell, menu, đăng nhập và các trang quản lý riêng. Một s�
 - Database runtime duy nhất của bản local: `data/shop.db`. Ảnh tải lên: `data/uploads`. Khóa ký phiên: `data/.session-secret`. Các dữ liệu này không đưa lên Git.
 - Trước lần nâng cấp đầu tiên của database cũ, ứng dụng lưu bản sao SQLite tại `data/backups/before-v2.db`. Migration bổ sung bảng/cột, giữ tài khoản, đơn, tên/giá tại thời điểm mua và tồn kho hiện tại. Khởi động lại không nhân bản biến thể/voucher.
 - Có thể đặt `NEU_DB_PATH` và `NEU_SESSION_SECRET` qua biến môi trường. Ảnh tải lên được lưu cạnh database đang dùng, nên các bài kiểm thử không ghi vào dữ liệu demo chính.
-- Mật khẩu băm PBKDF2 có salt; phiên ký và cookie HttpOnly; form ghi dữ liệu kiểm tra CSRF; quyền và chủ sở hữu dữ liệu được kiểm tra ở backend. Đổi mật khẩu/khóa tài khoản/đổi role thu hồi phiên cũ. Không cho tự khóa hoặc tự bỏ quyền admin.
+- Mật khẩu băm PBKDF2 có salt; phiên ký tách riêng từng tab trình duyệt; form ghi dữ liệu kiểm tra CSRF; quyền và chủ sở hữu dữ liệu được kiểm tra ở backend. Đổi mật khẩu/khóa tài khoản/đổi role thu hồi phiên cũ. Không cho tự khóa hoặc tự bỏ quyền admin.
 
 ## Giới hạn được công bố
 
@@ -128,7 +128,7 @@ File sơ đồ ở `data/erd.html` giữ mô hình do người dùng cung cấp,
 
 ## Chức năng bổ sung
 
-Đã có liên hệ công khai/hộp thư admin, giới thiệu và dịch vụ có thể chỉnh sửa, danh mục hai cấp, tin tức theo chủ đề, thống kê truy cập và hợp đồng mua hàng điện tử demo. Xem [hướng dẫn chi tiết](docs/feature-completion.md). Cấu hình thông tin cửa hàng tại `/admin/settings`. Hợp đồng nằm trong chi tiết đơn và `/account/contracts`; admin quản lý tại `/admin/contracts`. OTP chỉ mô phỏng trên local; tải HTML hoặc in thành PDF bằng trình duyệt.
+Đã có liên hệ công khai/hộp thư admin, giới thiệu và dịch vụ có thể chỉnh sửa, danh mục hai cấp, tin tức theo chủ đề, thống kê truy cập và hợp đồng mua hàng điện tử demo. Xem [hướng dẫn chi tiết](docs/feature-completion.md). Cấu hình thông tin cửa hàng tại `/admin/settings`. Checkout mở ngay hợp đồng trước thanh toán: khách đọc, đồng ý và xác nhận OTP, sau đó thanh toán online hoặc chờ admin duyệt COD. Máy chủ chặn thanh toán/duyệt đơn khi chưa xác nhận hợp đồng. Tra cứu tại chi tiết đơn và `/account/contracts`; admin quản lý tại `/admin/contracts`. OTP chỉ mô phỏng trên local; tải HTML hoặc in thành PDF bằng trình duyệt.
 
 Chạy kiểm thử bổ sung bằng `npm run check:portal` (database thử riêng).
 

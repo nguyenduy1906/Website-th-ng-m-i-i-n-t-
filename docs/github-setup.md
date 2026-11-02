@@ -18,6 +18,7 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 npm ci
 Copy-Item .env.example .env
+npm run news:import
 npm run dev
 ```
 

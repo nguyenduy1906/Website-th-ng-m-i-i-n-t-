@@ -1,14 +1,6 @@
 (() => {
-  document.querySelectorAll('.editor-toolbar,[data-map-load],[data-copy-url],[data-share-url],[data-contract-print]').forEach(element=>{element.hidden=false;});
-  const status = (target,message) => { const region=target.closest('.share-tools,.portal-actions')?.querySelector('[role=status]');if(region)region.textContent=message; };
-  async function copy(value) {
-    if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(value);return;}
-    const input=document.createElement('textarea');input.value=value;document.body.append(input);input.select();
-    const success=document.execCommand('copy');input.remove();if(!success)throw new Error('Trình duyệt không hỗ trợ sao chép tự động.');
-  }
+  document.querySelectorAll('.editor-toolbar,[data-map-load],[data-contract-print]').forEach(element=>{element.hidden=false;});
   document.addEventListener('click',async event=>{
-    const share=event.target.closest('[data-share-url],[data-copy-url]');
-    if(share){try{const url=share.dataset.shareUrl||location.href;if(share.dataset.shareUrl&&navigator.share){await navigator.share({title:share.dataset.shareTitle,url});status(share,'Đã mở bảng chia sẻ.');}else{await copy(url);status(share,'Đã sao chép liên kết.');if(share.matches('[data-copy-url]'))share.textContent='Đã sao chép đường dẫn';}}catch(error){if(error.name!=='AbortError')status(share,error.message);}return;}
     const map=event.target.closest('[data-map-load]');
     if(map){const frame=document.createElement('iframe');frame.src=map.dataset.mapSrc;frame.title='Vị trí cửa hàng trên Google Maps';frame.className='store-map';frame.loading='lazy';frame.referrerPolicy='no-referrer';map.closest('section').querySelector('[data-map-target]').replaceChildren(frame);map.disabled=true;map.textContent='Đã hiển thị bản đồ';return;}
     if(event.target.closest('[data-contract-print]')){window.print();return;}

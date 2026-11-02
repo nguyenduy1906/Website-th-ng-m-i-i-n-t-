@@ -1,0 +1,132 @@
+{
+  "2": {
+    "name": "Lenovo",
+    "path": "/static/images/brands/2-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/lenovo-240x50.png"
+  },
+  "3": {
+    "name": "Acer",
+    "path": "/static/images/brands/3-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/acer-240x50.png"
+  },
+  "4": {
+    "name": "ASUS",
+    "path": "/static/images/brands/4-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/ASUS-240x50.png"
+  },
+  "5": {
+    "name": "MSI",
+    "path": "/static/images/brands/5-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/MSI-240x50.png"
+  },
+  "6": {
+    "name": "Dell",
+    "path": "/static/images/brands/6-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/Dell-240x50.png"
+  },
+  "7": {
+    "name": "HP",
+    "path": "/static/images/brands/7-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/HP-240x50.png"
+  },
+  "8": {
+    "name": "Apple",
+    "path": "/static/images/brands/8-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/iPhone-240x50.png"
+  },
+  "9": {
+    "name": "Samsung",
+    "path": "/static/images/brands/9-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/Samsung-240x50.png"
+  },
+  "10": {
+    "name": "Xiaomi",
+    "path": "/static/images/brands/10-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/XIAOMI-new-240x50.png"
+  },
+  "11": {
+    "name": "HONOR",
+    "path": "/static/images/brands/11-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/honor.png"
+  },
+  "12": {
+    "name": "OPPO",
+    "path": "/static/images/brands/12-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/Oppo-240x50.png"
+  },
+  "13": {
+    "name": "Vivo",
+    "path": "/static/images/brands/13-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/Vivo-240x50.png"
+  },
+  "14": {
+    "name": "Realme",
+    "path": "/static/images/brands/14-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/Realme-240x50.png"
+  },
+  "16": {
+    "name": "StarGO",
+    "path": "/static/images/brands/16-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/STARGO-240x50.png"
+  },
+  "17": {
+    "name": "Havit",
+    "path": "/static/images/brands/17-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/HAVIT-240x50.png"
+  },
+  "18": {
+    "name": "Apple Chính hãng",
+    "path": "/static/images/brands/18-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/iPhone-240x50.png"
+  },
+  "19": {
+    "name": "Sennheiser",
+    "path": "/static/images/brands/19-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/sennheiser-240x50.png"
+  },
+  "20": {
+    "name": "Bose",
+    "path": "/static/images/brands/20-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/Bose-240x50.png"
+  },
+  "21": {
+    "name": "JBL",
+    "path": "/static/images/brands/21-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/JBL-240x50.png"
+  },
+  "22": {
+    "name": "Anker",
+    "path": "/static/images/brands/22-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/Anker-240x50.png"
+  },
+  "23": {
+    "name": "Huawei",
+    "path": "/static/images/brands/23-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/HUAWEI-240x50.png"
+  },
+  "24": {
+    "name": "Sony",
+    "path": "/static/images/brands/24-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/SONY-240x50.png"
+  },
+  "25": {
+    "name": "Samsung Chính hãng",
+    "path": "/static/images/brands/25-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Brand/Samsung-240x50.png"
+  },
+  "27": {
+    "name": "HyperX",
+    "path": "/static/images/brands/27-full.svg",
+    "source": "https://github.com/simple-icons/simple-icons/blob/develop/icons/hyperx.svg"
+  },
+  "28": {
+    "name": "Alpha Works",
+    "path": "/static/images/brands/28-wordmark.png",
+    "source": "https://cdn2.cellphones.com.vn/x/media/wysiwyg/Web/Logo/AlphaWork-2026.png"
+  },
+  "43": {
+    "name": "TP-Link",
+    "path": "/static/images/brands/43-full.svg",
+    "source": "https://github.com/simple-icons/simple-icons/blob/develop/icons/tplink.svg"
+  }
+}

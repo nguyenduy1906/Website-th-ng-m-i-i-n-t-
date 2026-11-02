@@ -4,7 +4,7 @@ from datetime import date
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .core import audit, cancel_order, event, finish_order, form_data, integer, localtime, notify, order_for, redirect, render, require_user, upload
+from .core import audit, cancel_order, event, finish_order, form_data, integer, localtime, notify, order_for, redirect, render, require_signed_contract, require_user, upload
 from .db import connect, password_hash, password_matches
 
 router = APIRouter()
@@ -175,7 +175,7 @@ async def customer_cancel(request: Request, order_id: int):
         if order["user_id"] != user["id"] or order["status"] not in ("Chờ thanh toán", "Chờ xác nhận"):
             raise HTTPException(400, "Khách chỉ có thể hủy trước khi đơn được chuẩn bị.")
         cancel_order(db, order, user["id"], reason)
-    return redirect(f"/orders/{order_id}", request, "Đã hủy đơn và hoàn tồn kho. Khoản thanh toán demo đã thu được hoàn tự động.")
+    return redirect(f"/orders/{order_id}", request, 'Đã hủy đơn và hoàn tồn kho. Khoản thanh toán đã thu được hoàn tự động.')
 
 
 @router.post("/orders/{order_id}/pay")
@@ -187,13 +187,14 @@ async def pay_again(request: Request, order_id: int):
         order = order_for(db, user, order_id)
         if order["status"] != "Chờ thanh toán":
             raise HTTPException(400, "Đơn không còn chờ thanh toán.")
+        require_signed_contract(db, order_id)
         db.execute("UPDATE payments SET status='Đã hủy' WHERE order_id=? AND status='Chờ thanh toán'", (order_id,))
         cod = data.get("method") == "cod"
         method = "cod" if cod else order["payment_method"]
         payment_id = db.execute("INSERT INTO payments(order_id,method,amount,reference) VALUES(?,?,?,?)", (order_id, method, order["total"], "PAY-" + secrets.token_hex(10))).lastrowid
         if cod:
             db.execute("UPDATE orders SET status='Chờ xác nhận',payment_method='cod',expires_at=NULL WHERE id=?", (order_id,))
-            event(db, order, "Chờ xác nhận", "Chuyển sang COD mô phỏng.")
+            event(db, order, "Chờ xác nhận", 'Chuyển sang COD thử nghiệm.')
     return redirect(f"/orders/{order_id}" if cod else f"/payments/{payment_id}")
 
 

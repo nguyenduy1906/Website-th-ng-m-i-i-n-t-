@@ -12,6 +12,7 @@
     "check:live-filters": "node tests/live-filters.mjs",
     "check:redesign": "node tests/redesign.mjs --after",
     "check:portal": "node tests/portal-browser.mjs",
+    "check:contracts": "node tests/contract-checkout.mjs",
     "demo:seed": "python -m app.db --seed-demo",
     "docs:erd": "node tools/build-erd.mjs",
     "dev": "python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000",
@@ -19,7 +20,11 @@
     "check": "python -m unittest discover -s tests -v",
     "check:browser": "node tests/browser.mjs",
     "design:check": "node .agents/skills/hallmark/scripts/sloplint.mjs app/static/style.css app/static/customer.css app/static/admin.css app/static/ui.css --scope app --render --url http://127.0.0.1:8000/ --url http://127.0.0.1:8000/admin/login",
-    "github:prepare": "python tools/prepare_github.py"
+    "github:prepare": "python tools/prepare_github.py",
+    "news:import": "python -m tools.import_news",
+    "check:tabs": "node tests/tab-sessions.mjs",
+    "check:navigation": "node tests/smooth-navigation.mjs",
+    "check:auth-transition": "node tests/auth-transition.mjs"
   },
   "devDependencies": {
     "puppeteer-core": "^25.16.0"

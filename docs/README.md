@@ -37,3 +37,24 @@ Theo yêu cầu người dùng, gỡ chức năng so sánh sản phẩm (FR08), 
 Nút Tư vấn NEU SHOP xuất hiện trong shell khách hàng. API GET `/api/chatbot?q=...` tra cứu tên, thông số, giá, tồn kho, bảo hành của sản phẩm công khai; hỗ trợ ngân sách dạng “20 triệu”. Trả lời các hướng dẫn mua hàng và chính sách demo. Đây là chatbot truy xuất theo từ khóa, chưa dùng mô hình ngôn ngữ; chưa ghi nhớ hội thoại hoặc hiểu mọi cách diễn đạt. Không đọc tài khoản/đơn hàng riêng tư.
 
 Chatbot đã bổ sung provider Ollama local mặc định và Gemini cấu hình sau bằng `.env`. Chi tiết thiết lập, dữ liệu gửi và giới hạn tại `docs/chatbot-ai.md`. Khi provider không sẵn sàng, UI ghi rõ đang tra cứu local. Khả năng hiểu ngôn ngữ tự nhiên yêu cầu runtime/model hoặc API key thực tế.
+
+## Logo thương hiệu và Góc công nghệ
+
+Dải thương hiệu dùng logo SVG local từ Simple Icons; danh sách nguồn tại `docs/brand-logos.json`. Logo giữ liên kết lọc `/products?brand=...`. 18 bài biên soạn mới và link nguồn FPT Shop/Sforum nằm tại `docs/news-editorial.json`; dùng `npm run news:import` để nhập sau khi clone (không nhân đôi tiêu đề và không ghi đè bài đã có). Hai bài seed cũ được mở rộng khi nội dung vẫn ngắn; bản nội dung tại `docs/news-baseline.json`. Ảnh minh họa dùng sản phẩm local phù hợp nhóm thiết bị, không sao chép ảnh bài viết nguồn.
+
+## Phiên riêng theo tab và logo đầy đủ
+
+Theo yêu cầu người dùng: trình duyệt lưu phiên ký trong sessionStorage riêng từng tab, truyền bằng header nội bộ; không dùng cookie đăng nhập chung giữa tab. Trang riêng tư mở qua bước khởi tạo phiên và yêu cầu JavaScript. Mở tab mới cần đăng nhập lại; tải lại/điều hướng trong tab hiện tại giữ phiên. Trang công khai vẫn xem được khi tắt JavaScript. Logo thương hiệu thay bằng 24 ảnh wordmark PNG từ nguồn CellphoneS và hai SVG đã căn khung; nguồn từng ảnh nằm trong docs/brand-logos.json.
+
+## Hợp đồng trước thanh toán
+
+Checkout tự lập hợp đồng theo đơn và dẫn khách đọc/xác nhận OTP trước thanh toán online hoặc chờ duyệt COD. Admin chỉ duyệt sang chuẩn bị sau khi hợp đồng đã xác nhận; không xác nhận thay khách. Đơn online giữ hàng tối đa 15 phút từ lúc tạo, bao gồm thời gian đọc/xác nhận. Đơn cũ chưa có hợp đồng lập từ chi tiết đơn.
+
+## Giới hạn giao diện quản trị
+
+Theo yêu cầu người dùng, phiên đã đăng nhập admin chỉ vào khu quản trị. Mở URL public/khách hàng sẽ về `/admin`; yêu cầu ghi vào chức năng khách hàng bị từ chối. Shell admin không có liên kết cửa hàng/hồ sơ khách hàng và đăng xuất về `/admin/login`. Admin vẫn dùng API theo dõi đơn/hỗ trợ nội bộ và xem/in/tải hợp đồng bằng route `/admin/contracts/...`.
+
+## Rà soát giao diện chi tiết
+
+Bố cục và cách viết được cập nhật theo DESIGN.md. Báo cáo phạm vi kiểm tra tại [interface-review.md](interface-review.md). Dữ liệu hợp đồng đã xác nhận và lịch sử giao dịch không được viết lại trong đợt chỉnh câu chữ.
+

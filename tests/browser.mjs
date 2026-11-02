@@ -174,8 +174,15 @@ try {
   await page.waitForFunction(() => document.querySelector('.order-summary dl').textContent.includes('100.000') && !document.querySelector('[data-submit]').disabled);
   assert(await page.$eval('button[value="preview"]', button => button.hidden), 'Checkout preview needs no confirmation button');
   await submit('[data-submit]');
-  const orderPath = new URL(page.url()).pathname;
-  assert(orderPath.startsWith('/orders/'), 'Order is created through browser');
+  const contractPath = new URL(page.url()).pathname;
+  assert(contractPath.startsWith('/contracts/'), 'Checkout opens contract before payment');
+  const orderPath = await page.$eval('.contract-layout a[href*="/orders/"]', element => element.getAttribute('href'));
+  await submit(`form[action="${contractPath}/otp"] button`);
+  const contractCode = await page.$eval('#contract-demo-otp', element => element.textContent.trim());
+  await page.type('#contract-code', contractCode);
+  await page.click('[name=consent]');
+  await submit(`form[action="${contractPath}/sign"] button`);
+  assert((await page.content()).includes('Đã xác nhận OTP'), 'Customer confirms contract before admin processing');
   await inspect('order', orderPath);
   await inspect('account', '/account');
   for (const section of ['profile','addresses','security','orders','notifications','support']) await inspect('account-' + section, '/account/' + section);

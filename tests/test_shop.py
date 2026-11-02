@@ -142,6 +142,70 @@ class ShopTests(unittest.TestCase):
         self.assertTrue(admin.url.endswith('/admin'))
         return admin
 
+    def test_admin_personal_profile_and_password(self):
+        admin = self.login_admin()
+        old = self.query("SELECT * FROM users WHERE email='admin@neushop.local'")[0]
+        try:
+            self.assertEqual(admin.get('/admin/profile'), 200)
+            self.assertIn('href="/admin/profile?edit=true"', admin.html)
+            self.assertIn('class="admin-rail-logout"', admin.html)
+            self.assertNotIn('Không có giao dịch thực', admin.html)
+            self.assertEqual(admin.post('/admin/profile', name='A', phone='abc', gender='invalid'), 400)
+            self.assertEqual(admin.post('/admin/profile', name='Quản trị cá nhân', phone='0912345678', birth_date='1995-01-02', gender='Nam', role='customer', email='changed@example.com'), 200)
+            updated = self.query('SELECT * FROM users WHERE id=?', (old['id'],))[0]
+            self.assertEqual(updated['name'], 'Quản trị cá nhân')
+            self.assertEqual(updated['email'], old['email'])
+            self.assertEqual(updated['role'], 'admin')
+            other = self.login_admin()
+            self.assertEqual(admin.post('/admin/profile/password', current_password='wrong', password='NewPassword123', confirm='NewPassword123'), 400)
+            self.assertEqual(admin.post('/admin/profile/password', current_password='Admin@12345', password='NewPassword123', confirm='NewPassword123'), 200)
+            self.assertTrue(admin.url.endswith('/admin/profile'))
+            other.get('/admin/profile')
+            self.assertTrue(other.url.endswith('/admin/login'))
+            self.assertEqual(admin.post('/logout'), 200)
+            self.assertTrue(admin.url.endswith('/admin/login'))
+            admin.get('/admin/profile')
+            self.assertTrue(admin.url.endswith('/admin/login'))
+            customer = Browser(self.base)
+            self.register(customer)
+            self.assertEqual(customer.get('/admin/profile'), 403)
+            self.assertEqual(customer.post('/admin/profile', name='Unauthorized'), 403)
+        finally:
+            with closing(sqlite3.connect(self.database)) as db, db:
+                db.execute('UPDATE users SET name=?,phone=?,birth_date=?,gender=?,password=?,auth_rev=? WHERE id=?', (old['name'], old['phone'], old['birth_date'], old['gender'], old['password'], old['auth_rev'], old['id']))
+
+    def test_admin_session_stays_in_admin_portal(self):
+        admin = self.login_admin()
+        for path in ('/', '/products', '/products/1', '/cart', '/checkout', '/account/profile', '/account/security', '/news', '/login', '/administer'):
+            with self.subTest(path=path):
+                self.assertEqual(admin.get(path), 200)
+                self.assertTrue(admin.url.endswith('/admin'))
+                self.assertNotIn('href="/"', admin.html)
+                self.assertNotIn('href="/account/', admin.html)
+        for path, fields in (('/cart/add', {'variant_id': 2, 'quantity': 1}), ('/checkout', {}), ('/contact', {}), ('/api/chatbot', {'q': 'hi'})):
+            with self.subTest(path=path):
+                self.assertEqual(admin.post(path, **fields), 403)
+        self.assertEqual(admin.get('/api/health'), 200)
+        self.assertEqual(admin.post('/logout'), 200)
+        self.assertTrue(admin.url.endswith('/admin/login'))
+        self.assertRegex(admin.html, r'class="auth-layout(?: |")')
+
+    def test_shared_login_routes_by_account_role(self):
+        admin = Browser(self.base)
+        self.assertEqual(admin.get('/login'), 200)
+        self.assertEqual(admin.post('/login', email='admin@neushop.local', password='wrong'), 400)
+        self.assertRegex(admin.html, r'class="auth-layout(?: |")')
+        self.assertEqual(admin.post('/login', email='admin@neushop.local', password='Admin@12345'), 200)
+        self.assertTrue(admin.url.endswith('/admin'))
+        customer = Browser(self.base)
+        email = self.register(customer)
+        customer.post('/logout')
+        self.assertEqual(customer.get('/admin/login'), 200)
+        self.assertRegex(customer.html, r'class="auth-layout(?: |")')
+        self.assertEqual(customer.post('/login', email=email, password='Password123'), 200)
+        self.assertTrue(customer.url.endswith('/account'))
+        self.assertEqual(customer.get('/admin/profile'), 403)
+
     def make_order(self, product_id=2, quantity=1, method='cod', voucher='', shipping='standard'):
         self.register()
         self.browser.get(f'/products/{product_id}')
@@ -155,11 +219,68 @@ class ShopTests(unittest.TestCase):
         return order, data
 
     def complete(self, order_id, admin=None):
+        self.confirm_contract(order_id)
         admin = admin or self.login_admin()
         admin.get(f'/admin/orders/{order_id}')
         for status in ('Đang chuẩn bị','Đang giao','Hoàn tất'):
             self.assertEqual(admin.post(f'/admin/orders/{order_id}/status',status=status),200)
         return admin
+
+    def confirm_contract(self, order_id):
+        contract = self.query('SELECT * FROM sales_contracts WHERE order_id=?', (order_id,))[0]
+        if contract['status'] == 'signed':
+            return
+        self.browser.get(f"/contracts/{contract['id']}")
+        self.assertEqual(self.browser.post(f"/contracts/{contract['id']}/otp"), 200)
+        code = re.search(r'id="contract-demo-otp">(\d{6})', self.browser.html)[1]
+        name = json.loads(contract['snapshot'])['buyer']['name']
+        self.assertEqual(self.browser.post(f"/contracts/{contract['id']}/sign", signer_name=name, code=code, consent='1'), 200)
+
+    def test_checkout_contract_before_payment_and_admin_approval(self):
+        for method in ('cod', 'qr', 'card', 'wallet'):
+            with self.subTest(method=method):
+                order, data = self.make_order(product_id=8, method=method)
+                contract = self.query('SELECT * FROM sales_contracts WHERE order_id=?', (order['id'],))[0]
+                self.assertTrue(self.browser.url.endswith(f"/contracts/{contract['id']}"))
+                self.assertEqual(contract['status'], 'draft')
+                self.assertIn('Hợp đồng mua hàng điện tử', self.browser.html)
+                self.assertEqual(self.browser.request('/checkout', data), 200)
+                self.assertTrue(self.browser.url.endswith(f"/contracts/{contract['id']}"))
+                self.assertEqual(len(self.query('SELECT id FROM sales_contracts WHERE order_id=?', (order['id'],))), 1)
+                admin = self.login_admin()
+                self.assertEqual(admin.post(f"/admin/orders/{order['id']}/status", status='Đang chuẩn bị'), 409 if method == 'cod' else 400)
+                payment = self.query('SELECT * FROM payments WHERE order_id=?', (order['id'],))[0]
+                if method != 'cod':
+                    self.assertEqual(self.browser.get(f"/payments/{payment['id']}"), 200)
+                    self.assertTrue(self.browser.url.endswith(f"/contracts/{contract['id']}"))
+                    self.assertEqual(self.browser.post(f"/payments/{payment['id']}/simulate", result='success'), 409)
+                    self.assertEqual(self.browser.post(f"/orders/{order['id']}/pay"), 409)
+                    self.assertEqual(self.browser.post(f"/orders/{order['id']}/pay", method='cod'), 409)
+                    self.assertEqual(self.query('SELECT status FROM payments WHERE id=?', (payment['id'],))[0]['status'], 'Chờ thanh toán')
+                self.confirm_contract(order['id'])
+                if method != 'cod':
+                    self.assertIn('Tiếp tục thanh toán', self.browser.html)
+                    self.assertEqual(self.browser.get(f"/payments/{payment['id']}"), 200)
+                    self.assertEqual(self.browser.post(f"/payments/{payment['id']}/simulate", result='success'), 200)
+                self.assertEqual(admin.post(f"/admin/orders/{order['id']}/status", status='Đang chuẩn bị'), 200)
+
+    def test_contract_void_or_tampering_blocks_payment_and_approval(self):
+        for method in ('cod', 'qr'):
+            for tamper in (False, True):
+                with self.subTest(method=method, tamper=tamper):
+                    order, _ = self.make_order(product_id=8, method=method)
+                    self.confirm_contract(order['id'])
+                    if tamper:
+                        self.query("UPDATE sales_contracts SET snapshot=snapshot||' ' WHERE order_id=?", (order['id'],))
+                    else:
+                        self.query("UPDATE sales_contracts SET status='void' WHERE order_id=?", (order['id'],))
+                    admin = self.login_admin()
+                    if method == 'cod':
+                        self.assertEqual(admin.post(f"/admin/orders/{order['id']}/status", status='Đang chuẩn bị'), 409)
+                    else:
+                        payment = self.query('SELECT id FROM payments WHERE order_id=?', (order['id'],))[0]
+                        self.assertEqual(self.browser.post(f"/payments/{payment['id']}/simulate", result='success'), 409)
+                    self.assertEqual(self.browser.post(f"/orders/{order['id']}/cancel"), 200)
 
     def multipart(self,browser,path,fields,filename,content):
         boundary='----NEUIntegrationTestBoundary'
@@ -245,7 +366,7 @@ class ShopTests(unittest.TestCase):
             self.query('UPDATE products SET subcategory=? WHERE id=1',(slug,))
             self.assertEqual(self.browser.get('/products?category='+slug),200)
             self.assertIn('NEU Book Air 14',self.browser.html)
-            self.assertEqual(admin.post('/catalog/not-real',kind='category'),404)
+            self.assertEqual(admin.post('/catalog/not-real',kind='category'),403)
             self.assertEqual(admin.post('/admin/catalog/visibility',kind='category',id=slug),200)
             self.assertEqual(self.browser.get('/products/1'),404)
             self.assertEqual(admin.post('/admin/catalog/visibility',kind='category',id=slug),200)
@@ -292,6 +413,11 @@ class ShopTests(unittest.TestCase):
         admin=self.login_admin()
         self.assertEqual(admin.get(f'/admin/contracts/{cid}'),200)
         self.assertEqual(admin.post(f'/contracts/{cid}/sign',signer_name='Nguyễn Demo',code=code,consent='1'),403)
+        for suffix in ('download', 'print'):
+            self.assertEqual(admin.get(f'/admin/contracts/{cid}/{suffix}'), 200)
+            self.assertIn(contract['number'], admin.html)
+            self.assertNotIn('href="/contracts/', admin.html)
+            self.assertEqual(outsider.get(f'/admin/contracts/{cid}/{suffix}'), 403)
 
     def test_portal_contract_otp_session_expiry_attempt_limit(self):
         order,contract,code=self.contract_fixture();cid=contract['id']
@@ -403,6 +529,22 @@ class ShopTests(unittest.TestCase):
         self.browser.get('/api/search?q=Book')
         self.assertGreater(len(json.loads(self.browser.html)),0)
 
+    def test_chatbot_conversation_does_not_match_ai_product_names(self):
+        self.browser.get('/')
+        for question in ['bạn là ai', 'Bạn là ai?', 'bạn tên gì', 'bạn làm được gì', 'xin chào', 'cảm ơn bạn']:
+            with self.subTest(question=question):
+                status = self.browser.post('/api/chatbot', q=question, history=json.dumps([{'role':'user','text':'laptop dưới 20 triệu'}]))
+                self.assertEqual(status, 200)
+                result = json.loads(self.browser.html)
+                self.assertEqual(result['products'], [])
+                self.assertEqual(result['intent'], 'conversation')
+                self.assertNotIn('Thông tin đang có', result['answer'])
+        self.browser.get('/')
+        self.assertEqual(self.browser.post('/api/chatbot', q='laptop dưới 20 triệu', history='[]'), 200)
+        result = json.loads(self.browser.html)
+        self.assertTrue(result['products'])
+        self.assertTrue(all(product['price'] <= 20000000 for product in result['products']))
+
     def test_csrf_and_permissions(self):
         self.browser.get('/products/1')
         self.assertEqual(self.browser.request('/cart/add',{'product_id':1,'quantity':1}),403)
@@ -467,6 +609,8 @@ class ShopTests(unittest.TestCase):
 
     def test_online_failure_retry_success_and_cancel_refund(self):
         order,_=self.make_order(method='qr')
+        self.confirm_contract(order['id'])
+        self.browser.get(f"/payments/{self.query('SELECT id FROM payments WHERE order_id=?',(order['id'],))[0]['id']}")
         self.assertTrue(self.browser.url.rsplit('/',2)[1]=='payments')
         payment_id=int(self.browser.url.rsplit('/',1)[1])
         self.browser.post(f'/payments/{payment_id}/simulate',result='failed')
@@ -591,6 +735,7 @@ class ShopTests(unittest.TestCase):
 
     def test_customer_confirm_received_and_no_repeat_points(self):
         order,_=self.make_order(product_id=8)
+        self.confirm_contract(order['id'])
         admin=self.login_admin();admin.get(f"/admin/orders/{order['id']}")
         for status in ('Đang chuẩn bị','Đang giao'):admin.post(f"/admin/orders/{order['id']}/status",status=status)
         self.browser.get(f"/orders/{order['id']}")

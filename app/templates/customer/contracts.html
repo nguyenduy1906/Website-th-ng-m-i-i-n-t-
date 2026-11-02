@@ -1,2 +1,2 @@
 {% extends 'customer/base.html' %}
-{% block content %}<div class="page-heading"><span class="eyebrow">TÀI KHOẢN CỦA BẠN</span><h1>Hợp đồng điện tử</h1><p>Bản nội dung mua hàng và lịch sử xác nhận OTP trong bản demo local.</p></div><div class="account-layout">{% include 'customer/navigation.html' %}<section class="account-body surface">{% include 'customer/contracts_table.html' %}</section></div>{% endblock %}
+{% block content %}<div class="account-layout">{% include 'customer/navigation.html' %}<section class="account-body surface" aria-label="Danh sách hợp đồng điện tử">{% include 'customer/contracts_table.html' %}</section></div>{% endblock %}
