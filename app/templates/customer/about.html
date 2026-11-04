@@ -1,0 +1,44 @@
+{% extends 'customer/base.html' %}
+{% block content %}
+<nav class="breadcrumb" aria-label="Đường dẫn"><a href="/">Trang chủ</a><span>/</span><span aria-current="page">{{ page.title }}</span></nav>
+<div class="about-page">
+  <section class="about-hero surface" aria-labelledby="about-title">
+    <div class="about-hero-copy">
+      <span class="eyebrow">CÔNG NGHỆ · TRI THỨC · KẾT NỐI</span>
+      <h1 id="about-title">{{ page.title }}</h1>
+      <p class="portal-lead">{{ page.summary }}</p>
+      <p>Khám phá công nghệ cho học tập và công việc, cùng những thông tin về Đại học Kinh tế Quốc dân — NEU.</p>
+      <div class="portal-actions"><a class="button" href="/products">Khám phá sản phẩm {{ icon('arrow',18) }}</a><a class="button secondary" href="#ve-neu">Tìm hiểu về NEU</a></div>
+    </div>
+    <img class="about-hero-image" src="{{ page.image or '/static/images/neu-a2-atrium.jpg' }}" alt="{{ page.title if page.image else 'Không gian giếng trời và cầu thang trung tâm tòa A2, Đại học Kinh tế Quốc dân' }}" width="800" height="600">
+  </section>
+
+  <section id="ve-neu" class="about-university" aria-labelledby="neu-title">
+    <div class="about-section-heading"><div><span class="eyebrow">ĐẠI HỌC KINH TẾ QUỐC DÂN</span><h2 id="neu-title">Từ nền tảng tri thức đến tinh thần đổi mới</h2></div><a class="text-link" href="https://neu.edu.vn/">Website chính thức NEU {{ icon('arrow',18) }}</a></div>
+    <div class="about-neu-grid">
+      <div class="surface about-history">
+        <span class="about-year">1956</span>
+        <h3>Dấu mốc khởi đầu</h3>
+        <p>NEU được thành lập ngày 25/01/1956, với tên gọi ban đầu là Trường Kinh tế Tài chính. Ngày 15/11/2024, Trường được chuyển thành Đại học Kinh tế Quốc dân.</p>
+        <a class="text-link" href="https://neu.edu.vn/lich-su-hinh-thanh-va-phat-trien-truong/">Đọc lịch sử phát triển {{ icon('arrow',18) }}</a>
+      </div>
+      <div class="surface about-direction">
+        <span class="eyebrow">ĐỊNH HƯỚNG PHÁT TRIỂN</span>
+        <h3>Đào tạo, nghiên cứu và đóng góp cho cộng đồng</h3>
+        <p>NEU phát triển tri thức kinh tế và quản trị, đào tạo nhân lực, đồng thời nghiên cứu và tư vấn phục vụ phát triển đất nước.</p>
+        <p>Định hướng của Đại học là phát triển đa ngành, đa lĩnh vực, lấy nghiên cứu làm nền tảng và nâng cao vị thế trong khu vực.</p>
+        <a class="text-link" href="https://neu.edu.vn/su-menh-va-tam-nhin/">Sứ mệnh và tầm nhìn của NEU {{ icon('arrow',18) }}</a>
+      </div>
+    </div>
+    <div class="about-address"><span>{{ icon('home',20) }} <strong>Trụ sở Đại học</strong></span><p>207 đường Giải Phóng, phường Bạch Mai, Hà Nội, Việt Nam</p><a class="text-link" href="https://neu.edu.vn/lien-he/">Thông tin liên hệ NEU {{ icon('arrow',18) }}</a></div>
+  </section>
+
+  <section class="about-shop surface" aria-labelledby="shop-story-title">
+    <div class="about-story-label"><span class="eyebrow">CÂU CHUYỆN NEU SHOP</span><h2 id="shop-story-title">Hiểu thiết bị.<br>Chọn đúng nhu cầu.</h2><p>Công nghệ cho học tập và cuộc sống.</p></div>
+    <div class="rich-content">{{ page.body|richtext }}</div>
+  </section>
+
+  <aside class="about-source"><strong>Nguồn thông tin về NEU</strong><p>Nội dung được biên soạn từ website chính thức của Đại học Kinh tế Quốc dân. Địa chỉ trên là trụ sở Đại học; thông tin này không xác lập NEU SHOP là cửa hàng trực thuộc hoặc được NEU bảo trợ.</p></aside>
+  <section class="about-cta" aria-labelledby="about-cta-title"><div><h2 id="about-cta-title">Tìm thiết bị phù hợp với bạn</h2><p>Từ laptop, điện thoại đến âm thanh và phụ kiện.</p></div><div class="portal-actions"><a class="button" href="/products">Xem sản phẩm {{ icon('arrow',18) }}</a><a class="button secondary" href="/contact">Liên hệ hỗ trợ</a></div></section>
+</div>
+{% endblock %}

@@ -240,3 +240,7 @@ Theo yêu cầu ngày 03/11/2026, các vùng nền navy cũ trên khách hàng v
 
 Chuyển login/register giữ nguyên DOM khung xác thực và ảnh, chỉ thay form; không chạy lại script trang hoặc cuộn về đầu. Giữ email đã nhập, không sao chép mật khẩu. Desktop dùng chiều cao khung tối thiểu 620px, padding dọc 28px và khoảng cách field 14px để không nhảy bố cục giữa hai form. Kiểm tra bằng npm run check:auth-transition tại 375/768/1280px.
 
+
+## Trang giới thiệu ngày 04/11/2026
+Trang /about dùng bố cục ảnh NEU và phần mở đầu hai cột, lịch sử/định hướng Đại học, nội dung NEU SHOP chỉnh sửa từ admin và CTA sản phẩm/liên hệ. Mobile xếp một cột. Dùng ảnh A2 local có nguồn trong THIRD_PARTY_NOTICES.md, góc bo và token chung. Thông tin Đại học dẫn nguồn neu.edu.vn (lịch sử, sứ mệnh, liên hệ), tách địa chỉ Đại học khỏi cửa hàng; không suy diễn quan hệ bảo trợ. Trang dịch vụ giữ template cũ.
+

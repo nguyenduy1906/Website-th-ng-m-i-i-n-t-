@@ -52,7 +52,8 @@ def page(request: Request):
         record = db.execute('SELECT * FROM site_pages WHERE slug=? AND active=1',(request.url.path.strip('/'),)).fetchone()
     if not record:
         raise HTTPException(404,'Nội dung chưa được công bố.')
-    return render(request,'customer/site_page.html',title=record['title'],page=record)
+    template = 'customer/about.html' if record['slug'] == 'about' else 'customer/site_page.html'
+    return render(request,template,title=record['title'],page=record)
 
 
 @router.get('/contact')
